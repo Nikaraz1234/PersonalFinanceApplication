@@ -6,13 +6,13 @@ EXPOSE 80
 # Use the official .NET SDK image to build the project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["YourProject.csproj", "./"]
-RUN dotnet restore "./YourProject.csproj"
+COPY ["PersonalFinanceApplication.csproj", "./"]
+RUN dotnet restore "./PersonalFinanceApplication.csproj"
 COPY . .
-RUN dotnet publish "./YourProject.csproj" -c Release -o /app/publish
+RUN dotnet publish "./PersonalFinanceApplication.csproj" -c Release -o /app/publish
 
 # Use the runtime image again to run the application
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "YourProject.dll"]
+ENTRYPOINT ["dotnet", "PersonalFinanceApplication.dll"]
