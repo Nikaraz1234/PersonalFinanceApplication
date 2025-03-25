@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Npgsql;
+using Microsoft.Extensions.Logging;
+using Supabase; // Added missing using
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Kestrel Configuration
 builder.WebHost.ConfigureKestrel(serverOptions => {
     serverOptions.ConfigureEndpointDefaults(listenOptions => {
         listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2;
@@ -9,25 +13,29 @@ builder.WebHost.ConfigureKestrel(serverOptions => {
 });
 
 builder.WebHost.UseUrls("http://*:8080");
-// Add services to the container
 var connectionString = builder.Configuration.GetConnectionString("SupabaseConnection");
 
-// Supabase PostgreSQL connection with better error handling
-builder.Services.AddScoped<NpgsqlConnection>(_ =>
-{
-    var connection = new NpgsqlConnection(connectionString);
-    connection.Open(); // Will throw if fails
-    Console.WriteLine("Connected to Supabase PostgreSQL");
-    return connection;
-});
+// Database Configuration
+builder.Services.AddScoped<Supabase.Client>(_ =>
+    new Supabase.Client(
+        builder.Configuration["SupabaseUrl"],
+        builder.Configuration["SupabaseKey"],
+        new SupabaseOptions
+        {
+            AutoRefreshToken = true,
+            AutoConnectRealtime = true
+        }
+        )
+);
+
+
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Forward headers for Render's proxy
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
-{
+builder.Services.Configure<ForwardedHeadersOptions>(options => {
     options.ForwardedHeaders = ForwardedHeaders.All;
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
@@ -35,6 +43,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 var app = builder.Build();
 
+// Middleware Pipeline
 app.UseForwardedHeaders();
 
 if (app.Environment.IsDevelopment())
@@ -44,6 +53,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthorization();
+
+
 app.MapControllers();
 
-app.Run(); // Let Docker/Render handle the port
+app.MapGet("/", () => "API is running");
+app.MapGet("/healthz", () => Results.Ok("Healthy"));
+app.MapGet("/test", async (NpgsqlDataSource db) => {
+    return Results.Ok(await db.CreateCommand("SELECT 1").ExecuteScalarAsync());
+}); 
+
+app.Run();
