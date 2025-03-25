@@ -1,61 +1,49 @@
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(serverOptions => {
+    serverOptions.ConfigureEndpointDefaults(listenOptions => {
+        listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2;
+    });
+});
 
-// Add services to the container.
+builder.WebHost.UseUrls("http://*:8080");
+// Add services to the container
 var connectionString = builder.Configuration.GetConnectionString("SupabaseConnection");
 
-// Register NpgsqlConnection in DI container
-builder.Services.AddScoped<NpgsqlConnection>(provider =>
+// Supabase PostgreSQL connection with better error handling
+builder.Services.AddScoped<NpgsqlConnection>(_ =>
 {
     var connection = new NpgsqlConnection(connectionString);
-    try
-    {
-        connection.Open(); // Test connection early
-        return connection;
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Database connection failed: {ex.Message}");
-        throw; // Re-throw to prevent silent failures
-    }
+    connection.Open(); // Will throw if fails
+    Console.WriteLine("Connected to Supabase PostgreSQL");
+    return connection;
 });
 
-builder.Services.AddHttpsRedirection(options =>
-{
-    options.HttpsPort = 5001;
-});
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Forward headers for Render's proxy
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.ForwardedHeaders = ForwardedHeaders.All;
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 });
 
-
-
 var app = builder.Build();
+
 app.UseForwardedHeaders();
-// Configure the HTTP request pipeline.dasdasdas
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
-app.Run("http://0.0.0.0:8080;https://0.0.0.0:8443");
+app.Run(); // Let Docker/Render handle the port
