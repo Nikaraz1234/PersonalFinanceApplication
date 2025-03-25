@@ -1,6 +1,8 @@
-﻿namespace PersonalFinanceApplication.Services
+﻿using PersonalFinanceApplication.Interfaces;
+using System;
+
+namespace PersonalFinanceApplication.Services
 {
-    public class RecurringBillsService
-    {
-    }
+   
 }
+    
