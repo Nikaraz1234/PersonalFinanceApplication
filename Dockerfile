@@ -4,20 +4,22 @@ WORKDIR /src
 COPY ["PersonalFinanceApplication.csproj", "./"]
 RUN dotnet restore "./PersonalFinanceApplication.csproj"
 COPY . .
-RUN dotnet publish "./PersonalFinanceApplication.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 
 # Stage 2: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Critical environment variables
+# Environment variables (no inline comments!)
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:8080  # Forces port 8080 in all environments
+ENV ASPNETCORE_URLS=http://+:8080
+ENV DOTNET_RUNNING_IN_CONTAINER=true
+ENV DOTNET_EnableDiagnostics=0
 
-# Health check (Render-compatible)
-HEALTHCHECK --interval=30s --timeout=3s \
-  CMD curl -f http://localhost:8080/ || exit 1  # Changed to root endpoint
+# Health check
+HEALTHCHECK --interval=10s --timeout=2s --start-period=5s \
+  CMD curl -f http://localhost:8080/healthz || exit 1
 
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "PersonalFinanceApplication.dll"]
