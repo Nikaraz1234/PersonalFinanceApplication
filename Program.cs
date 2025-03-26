@@ -24,7 +24,15 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 builder.WebHost.UseUrls("http://*:8080");
 
 // ===== Services Configuration =====
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 // Supabase Client (PostgreSQL)
 var supabaseUrl = builder.Configuration["Supabase:Url"] ?? throw new ArgumentNullException("Supabase:Url");
 var supabaseKey = builder.Configuration["Supabase:Key"] ?? throw new ArgumentNullException("Supabase:Key");
@@ -63,6 +71,9 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+
+ 
+
 var app = builder.Build();
 
 // ===== Middleware Pipeline =====
@@ -77,7 +88,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseRouting();
-
+app.UseCors("AllowAll"); // Must be after UseRouting()
+app.UseAuthorization();
+app.MapControllers();
 // Minimal API Endpoints
 app.MapGet("/", () => "API is running");
 app.MapGet("/healthz", () => Results.Ok("Healthy"));
@@ -88,7 +101,6 @@ app.MapGet("/test", async (NpgsqlDataSource db) =>
 });
 
 // Controllers & Auth
-app.UseAuthorization();
-app.MapControllers();
+
 
 app.Run();
