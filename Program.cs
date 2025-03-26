@@ -63,6 +63,16 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 // ===== Middleware Pipeline =====
@@ -77,8 +87,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseRouting();
-
+app.UseCors("AllowAll") 
 // Minimal API Endpoints
+
+
+// Controllers & Auth
+app.UseAuthorization();
+app.MapControllers();
 app.MapGet("/", () => "API is running");
 app.MapGet("/healthz", () => Results.Ok("Healthy"));
 app.MapGet("/test", async (NpgsqlDataSource db) =>
@@ -86,9 +101,4 @@ app.MapGet("/test", async (NpgsqlDataSource db) =>
     await using var cmd = db.CreateCommand("SELECT 1");
     return Results.Ok(await cmd.ExecuteScalarAsync());
 });
-
-// Controllers & Auth
-app.UseAuthorization();
-app.MapControllers();
-
 app.Run();

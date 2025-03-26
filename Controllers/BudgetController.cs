@@ -47,15 +47,26 @@ namespace PersonalFinanceApplication.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBudget(int id, [FromBody] BudgetDTO budgetDto)
+        public async Task<ActionResult<BudgetDTO>> UpdateBudget(int id, [FromBody] BudgetDTO budgetDto)
         {
-            if (id != budgetDto.Id)
+            try
             {
-                return BadRequest("ID in URL does not match ID in request body");
-            }
+                if (id != budgetDto.Id)
+                {
+                    return BadRequest("ID mismatch");
+                }
 
-            var updatedBudget = await _budgetService.UpdateBudgetAsync(id, budgetDto);
-            return Ok(updatedBudget);
+                var updatedBudget = await _budgetService.UpdateBudgetAsync(id, budgetDto);
+                return Ok(updatedBudget);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
