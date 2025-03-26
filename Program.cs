@@ -76,6 +76,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseRouting();
 
 // Minimal API Endpoints
 app.MapGet("/", () => "API is running");
