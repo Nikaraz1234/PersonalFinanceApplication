@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using PersonalFinanceApplication.Interfaces;
+using PersonalFinanceApplication.Repositories;
+using PersonalFinanceApplication.Services;
 using Supabase;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,13 +45,17 @@ builder.Services.AddScoped<Supabase.Client>(_ =>
 builder.Services.AddSingleton<NpgsqlDataSource>(_ =>
     NpgsqlDataSource.Create(builder.Configuration.GetConnectionString("SupabaseConnection")));
 
+builder.Services.AddScoped<BudgetRepository>();
+builder.Services.AddScoped<TransactionRepository>();
 
-// API & Swagger
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Forwarded Headers (for reverse proxy support)
+
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.All;

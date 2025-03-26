@@ -1,4 +1,5 @@
-﻿using System.Transactions;
+﻿using PersonalFinanceApplication.DTOs;
+using PersonalFinanceApplication.Models;
 
 namespace PersonalFinanceApplication.Interfaces
 {
@@ -7,7 +8,7 @@ namespace PersonalFinanceApplication.Interfaces
         Task<Transaction> GetTransactionByIdAsync(int id);
         Task<IEnumerable<Transaction>> GetAllTransactionsAsync(int userId, int page = 1, int pageSize = 10);
         Task<Transaction> CreateTransactionAsync(Transaction transaction);
-        Task<Transaction> UpdateTransactionAsync(Transaction transaction);
+        Task<Transaction> UpdateTransactionAsync(int id, TransactionDTO transactionDto);
         Task<bool> DeleteTransactionAsync(int id);
     }
 }
