@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using PersonalFinanceApplication.Data;
 using PersonalFinanceApplication.Interfaces;
 using PersonalFinanceApplication.Repositories;
 using PersonalFinanceApplication.Services;
@@ -71,8 +73,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection")));
 
- 
+
 
 var app = builder.Build();
 
