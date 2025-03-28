@@ -84,7 +84,6 @@ builder.Services.AddControllers();
 // Register services
 
 
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

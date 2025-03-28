@@ -21,7 +21,6 @@ namespace PersonalFinanceApplication.Controllers
         }
 
 
-        /// Get all users (Admin only)
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserSummaryDTO>))]
@@ -32,7 +31,6 @@ namespace PersonalFinanceApplication.Controllers
         }
 
 
-        /// Get user by ID
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDTO))]
@@ -44,7 +42,6 @@ namespace PersonalFinanceApplication.Controllers
         }
 
 
-        /// Get complete user profile
 
         [HttpGet("{id}/profile")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserProfileDTO))]
@@ -54,7 +51,6 @@ namespace PersonalFinanceApplication.Controllers
             return profile == null ? NotFound() : Ok(profile);
         }
 
-        /// Register new user
 
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AuthResponseDto))]
@@ -71,8 +67,6 @@ namespace PersonalFinanceApplication.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        /// Update user details
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -94,7 +88,6 @@ namespace PersonalFinanceApplication.Controllers
         }
 
 
-        /// Delete user account
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -124,10 +117,7 @@ namespace PersonalFinanceApplication.Controllers
             return Ok(); // Always return OK for security
         }
         */
-
-        /// <summary>
         /// Complete password reset
-        /// </summary>
         [HttpPost("reset-password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

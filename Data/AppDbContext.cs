@@ -16,10 +16,6 @@ namespace PersonalFinanceApplication.Data
 
         private readonly string _connectionString;
 
-        public AppDbContext(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("SupabaseConnection");
-        }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
