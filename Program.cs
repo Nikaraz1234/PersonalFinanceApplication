@@ -65,13 +65,12 @@ builder.Services.AddScoped<Supabase.Client>(_ =>
 );
 
 
-builder.Services.AddScoped<BudgetRepository>();
-builder.Services.AddScoped<TransactionRepository>();
+builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
-
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
