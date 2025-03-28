@@ -13,7 +13,7 @@ namespace PersonalFinanceApplication.Repositories
         private readonly AppDbContext _context;
         private readonly IMapper _autoMapper;
 
-        public UserRepository(AppDbContext context, UserRepository userRepository, IMapper autoMapper)
+        public UserRepository(AppDbContext context, IMapper autoMapper)
         {
             _context = context;
             _autoMapper = autoMapper;
