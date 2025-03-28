@@ -13,11 +13,11 @@ namespace PersonalFinanceApplication.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
-        private readonly Mapper _automapper;
+        private readonly IMapper _automapper;
 
-        public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, Mapper automapper)
+        public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, IMapper automapper)
         {
-            _userRepository = userRepository;
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _passwordHasher = passwordHasher;
             _automapper = automapper;
         }
