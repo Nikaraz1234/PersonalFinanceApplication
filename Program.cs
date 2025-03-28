@@ -94,6 +94,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+builder.WebHost.UseSetting(WebHostDefaults.ServerUrlsKey, string.Empty);
 
 
 
