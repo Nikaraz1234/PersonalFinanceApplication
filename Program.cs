@@ -10,6 +10,7 @@ using PersonalFinanceApplication.Services;
 using Supabase;
 using AutoMapper;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Mvc;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -120,6 +121,18 @@ app.MapControllers();
 // Minimal API Endpoints
 app.MapGet("/", () => "API is running");
 app.MapGet("/healthz", () => Results.Ok("Healthy"));
+app.MapGet("/db-check", async ([FromServices] AppDbContext dbContext) =>
+{
+    try
+    {
+        bool canConnect = await dbContext.Database.CanConnectAsync();
+        return Results.Ok(new { DatabaseAccess = canConnect });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"DB Error: {ex.Message}");
+    }
+});
 
 // Controllers & Auth   
 
