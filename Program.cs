@@ -4,9 +4,12 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using PersonalFinanceApplication.Data;
 using PersonalFinanceApplication.Interfaces;
+using PersonalFinanceApplication.PasswordHasher;
 using PersonalFinanceApplication.Repositories;
 using PersonalFinanceApplication.Services;
 using Supabase;
+using AutoMapper;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,14 +55,32 @@ builder.Services.AddScoped<Supabase.Client>(_ =>
     )
 );
 // Add this to your services
-builder.Services.AddSingleton<NpgsqlDataSource>(_ =>
-    NpgsqlDataSource.Create(builder.Configuration.GetConnectionString("SupabaseConnection")));
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection")));
+
 
 builder.Services.AddScoped<BudgetRepository>();
 builder.Services.AddScoped<TransactionRepository>();
 
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
+{
+    cfg.AddMaps(typeof(Program).Assembly);
+}).CreateMapper());
+
+
+builder.Services.AddControllers();
+
+
+
+
+// Register services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -73,8 +94,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection")));
 
 
 

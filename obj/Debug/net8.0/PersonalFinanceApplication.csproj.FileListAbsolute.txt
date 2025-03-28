@@ -123,3 +123,6 @@ C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplicatio
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.pdb
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.genruntimeconfig.cache
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\ref\PersonalFinanceApplication.dll
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\AutoMapper.dll
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\BCrypt.Net-Next.dll

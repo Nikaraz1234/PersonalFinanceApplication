@@ -1,18 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using PersonalFinanceApplication.Data;
-using PersonalFinanceApplication.DTOs;
+using PersonalFinanceApplication.DTOs.Budgets;
 using PersonalFinanceApplication.Interfaces;
 using PersonalFinanceApplication.Models;
 
 namespace PersonalFinanceApplication.Repositories
 {
-    public class BudgetRepository :IBudgetRepository
+    public class BudgetRepository : IBudgetRepository
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public BudgetRepository(AppDbContext context)
+        public BudgetRepository(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task AddBudgetAsync(Budget budget)
@@ -29,40 +32,35 @@ namespace PersonalFinanceApplication.Repositories
                 _context.Budgets.Remove(budget);
                 await _context.SaveChangesAsync();
             }
-            else
-            {
-                throw new Exception($"Budget with Id {id} not found.");
-            }
         }
 
         public async Task<Budget> GetBudgetByIdAsync(int id)
         {
-            return await _context.Budgets.FindAsync(id);
+            return await _context.Budgets
+                .Include(b => b.Categories)
+                .FirstOrDefaultAsync(b => b.Id == id);
         }
 
-        public async Task<IEnumerable<Budget>> GetBudgetsByUserIdAsync(int userId)
+        public async Task<IEnumerable<Budget>> GetBudgetsByCategoryAsync(int budgetId, string category)
         {
-            var budgets = await _context.Budgets.Where(b => b.UserId == userId).ToListAsync();
-            return budgets;
+            return await _context.Budgets
+                .Where(b => b.Id == budgetId)
+                .Include(b => b.Categories.Where(bc => bc.Name == category))
+                .ToListAsync();
         }
 
-        public async Task UpdateBudgetAsync(int id, BudgetDTO budgetDto)
+        public async Task<IEnumerable<Budget>> GetUserBudgetsAsync(int userId)
         {
-            var budget = await _context.Budgets.FindAsync(id);
+            return await _context.Budgets
+                .Where(b => b.UserId == userId)
+                .Include(b => b.Categories)
+                .ToListAsync();
+        }
 
-            if(budget == null)
-            {
-                throw new Exception($"Budget with Id {budgetDto.Id} not found.");
-            }
-
-            budget.Category = budgetDto.Category;
-            budget.Limit = budgetDto.Limit;
-            budget.CurrentSpending = budgetDto.CurrentSpending;
-
+        public async Task UpdateBudgetAsync(Budget budget)
+        {
+            _context.Budgets.Update(budget);
             await _context.SaveChangesAsync();
-            
         }
-
-        
     }
 }

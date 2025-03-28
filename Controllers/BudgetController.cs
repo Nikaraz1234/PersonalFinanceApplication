@@ -1,61 +1,66 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PersonalFinanceApplication.DTOs;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using PersonalFinanceApplication.DTOs.Budgets;
+using PersonalFinanceApplication.DTOs.Budgets.Categories;
 using PersonalFinanceApplication.Interfaces;
 using PersonalFinanceApplication.Models;
+using PersonalFinanceApplication.Services;
 
 namespace PersonalFinanceApplication.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class BudgetsController : ControllerBase
     {
         private readonly IBudgetService _budgetService;
+        private readonly IMapper _mapper;
 
-        public BudgetsController(IBudgetService budgetService)
+        public BudgetsController(IBudgetService budgetService, IMapper mapper)
         {
             _budgetService = budgetService;
+            _mapper = mapper;
         }
 
-
         [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<Budget>>> GetUserBudgets(int userId)
+        public async Task<ActionResult<IEnumerable<BudgetSummaryDTO>>> GetUserBudgets(int userId)
         {
             var budgets = await _budgetService.GetUserBudgetsAsync(userId);
             return Ok(budgets);
         }
 
+        [HttpGet("{id}/categories")]
+        public async Task<ActionResult<IEnumerable<BudgetCategoryDTO>>> GetBudgetCategories(int id)
+        {
+            var categories = await _budgetService.GetBudgetCategoriesAsync(id);
+            return Ok(categories);
+        }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Budget>> GetBudget(int id)
+        public async Task<ActionResult<BudgetDTO>> GetBudget(int id)
         {
             var budget = await _budgetService.GetBudgetByIdAsync(id);
-
-            if (budget == null)
-            {
-                return NotFound();
-            }
-
+            if (budget == null) return NotFound();
             return Ok(budget);
         }
 
-
         [HttpPost]
-        public async Task<ActionResult<Budget>> CreateBudget([FromBody] Budget budget)
+        public async Task<ActionResult<BudgetDTO>> CreateBudget([FromBody] CreateBudgetDTO budgetDto)
         {
-            var createdBudget = await _budgetService.CreateBudgetAsync(budget);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var createdBudget = await _budgetService.CreateBudgetAsync(budgetDto);
             return CreatedAtAction(nameof(GetBudget), new { id = createdBudget.Id }, createdBudget);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<BudgetDTO>> UpdateBudget(int id, [FromBody] BudgetDTO budgetDto)
+        public async Task<ActionResult<BudgetDTO>> UpdateBudget(int id, [FromBody] UpdateBudgetDTO budgetDto)
         {
+            if (id != budgetDto.Id)
+                return BadRequest("ID mismatch");
+
             try
             {
-                if (id != budgetDto.Id)
-                {
-                    return BadRequest("ID mismatch");
-                }
-
                 var updatedBudget = await _budgetService.UpdateBudgetAsync(id, budgetDto);
                 return Ok(updatedBudget);
             }
@@ -63,22 +68,13 @@ namespace PersonalFinanceApplication.Controllers
             {
                 return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBudget(int id)
         {
             var result = await _budgetService.DeleteBudgetAsync(id);
-
-            if (!result)
-            {
-                return NotFound();
-            }
-
+            if (!result) return NotFound();
             return NoContent();
         }
     }

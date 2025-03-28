@@ -1,4 +1,4 @@
-﻿using PersonalFinanceApplication.DTOs;
+﻿using PersonalFinanceApplication.DTOs.Budgets;
 using PersonalFinanceApplication.Models;
 
 namespace PersonalFinanceApplication.Interfaces
@@ -6,9 +6,10 @@ namespace PersonalFinanceApplication.Interfaces
     public interface IBudgetRepository
     {
         Task<Budget> GetBudgetByIdAsync(int id);
-        Task<IEnumerable<Budget>> GetBudgetsByUserIdAsync(int userId);
+        Task<IEnumerable<Budget>> GetUserBudgetsAsync(int userId);
         Task AddBudgetAsync(Budget budget);
-        Task UpdateBudgetAsync(int id, BudgetDTO budgetDto);
+        Task UpdateBudgetAsync(Budget budget);
         Task DeleteBudgetAsync(int id);
+        Task<IEnumerable<Budget>> GetBudgetsByCategoryAsync(int budgetId, string category);
     }
 }

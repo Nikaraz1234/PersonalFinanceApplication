@@ -22,6 +22,33 @@ namespace PersonalFinanceApplication.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("PersonalFinanceApplication.Models.BillPayment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AmountPaid")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("RecurringBillId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecurringBillId");
+
+                    b.ToTable("BillPayments");
+                });
+
             modelBuilder.Entity("PersonalFinanceApplication.Models.Budget", b =>
                 {
                     b.Property<int>("Id")
@@ -30,18 +57,19 @@ namespace PersonalFinanceApplication.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("CurrentSpending")
-                        .HasColumnType("numeric");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
-                    b.Property<decimal>("Limit")
-                        .HasColumnType("numeric");
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -53,6 +81,35 @@ namespace PersonalFinanceApplication.Migrations
                     b.ToTable("Budgets");
                 });
 
+            modelBuilder.Entity("PersonalFinanceApplication.Models.BudgetCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AllocatedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("BudgetId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("CurrentSpending")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BudgetId");
+
+                    b.ToTable("BudgetCategories");
+                });
+
             modelBuilder.Entity("PersonalFinanceApplication.Models.RecurringBill", b =>
                 {
                     b.Property<int>("Id")
@@ -62,24 +119,30 @@ namespace PersonalFinanceApplication.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("DueDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
-                    b.Property<bool>("IsPaid")
+                    b.Property<int>("DueDay")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "DueDay");
 
                     b.ToTable("RecurringBills");
                 });
@@ -92,18 +155,19 @@ namespace PersonalFinanceApplication.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<decimal>("CurrentAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<decimal>("TargetAmount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("TargetDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -112,7 +176,43 @@ namespace PersonalFinanceApplication.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("savingsPots");
+                    b.ToTable("SavingsPots");
+                });
+
+            modelBuilder.Entity("PersonalFinanceApplication.Models.SavingsTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("SavingsPotId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Date");
+
+                    b.HasIndex("SavingsPotId");
+
+                    b.ToTable("SavingsTransactions");
                 });
 
             modelBuilder.Entity("PersonalFinanceApplication.Models.Transaction", b =>
@@ -124,20 +224,28 @@ namespace PersonalFinanceApplication.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("BudgetCategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("BudgetId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
-                    b.Property<bool>("IsIncome")
+                    b.Property<bool>("IsRecurring")
                         .HasColumnType("boolean");
 
                     b.Property<int>("UserId")
@@ -145,7 +253,11 @@ namespace PersonalFinanceApplication.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("BudgetCategoryId");
+
+                    b.HasIndex("BudgetId");
+
+                    b.HasIndex("UserId", "Date");
 
                     b.ToTable("Transactions");
                 });
@@ -163,25 +275,65 @@ namespace PersonalFinanceApplication.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("LastLogin")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("PasswordResetExpires")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PasswordResetToken")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("PersonalFinanceApplication.Models.BillPayment", b =>
+                {
+                    b.HasOne("PersonalFinanceApplication.Models.RecurringBill", "RecurringBill")
+                        .WithMany("Payments")
+                        .HasForeignKey("RecurringBillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RecurringBill");
                 });
 
             modelBuilder.Entity("PersonalFinanceApplication.Models.Budget", b =>
                 {
                     b.HasOne("PersonalFinanceApplication.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Budgets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -189,10 +341,21 @@ namespace PersonalFinanceApplication.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("PersonalFinanceApplication.Models.BudgetCategory", b =>
+                {
+                    b.HasOne("PersonalFinanceApplication.Models.Budget", "Budget")
+                        .WithMany("Categories")
+                        .HasForeignKey("BudgetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Budget");
+                });
+
             modelBuilder.Entity("PersonalFinanceApplication.Models.RecurringBill", b =>
                 {
                     b.HasOne("PersonalFinanceApplication.Models.User", "User")
-                        .WithMany()
+                        .WithMany("RecurringBills")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -203,7 +366,7 @@ namespace PersonalFinanceApplication.Migrations
             modelBuilder.Entity("PersonalFinanceApplication.Models.SavingsPot", b =>
                 {
                     b.HasOne("PersonalFinanceApplication.Models.User", "User")
-                        .WithMany()
+                        .WithMany("SavingsPots")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -211,15 +374,65 @@ namespace PersonalFinanceApplication.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("PersonalFinanceApplication.Models.SavingsTransaction", b =>
+                {
+                    b.HasOne("PersonalFinanceApplication.Models.SavingsPot", "SavingsPot")
+                        .WithMany("Transactions")
+                        .HasForeignKey("SavingsPotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SavingsPot");
+                });
+
             modelBuilder.Entity("PersonalFinanceApplication.Models.Transaction", b =>
                 {
-                    b.HasOne("PersonalFinanceApplication.Models.User", "User")
+                    b.HasOne("PersonalFinanceApplication.Models.BudgetCategory", "BudgetCategory")
                         .WithMany()
+                        .HasForeignKey("BudgetCategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("PersonalFinanceApplication.Models.Budget", null)
+                        .WithMany("Transactions")
+                        .HasForeignKey("BudgetId");
+
+                    b.HasOne("PersonalFinanceApplication.Models.User", "User")
+                        .WithMany("Transactions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("BudgetCategory");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PersonalFinanceApplication.Models.Budget", b =>
+                {
+                    b.Navigation("Categories");
+
+                    b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("PersonalFinanceApplication.Models.RecurringBill", b =>
+                {
+                    b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("PersonalFinanceApplication.Models.SavingsPot", b =>
+                {
+                    b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("PersonalFinanceApplication.Models.User", b =>
+                {
+                    b.Navigation("Budgets");
+
+                    b.Navigation("RecurringBills");
+
+                    b.Navigation("SavingsPots");
+
+                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }
