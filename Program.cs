@@ -25,6 +25,14 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
         listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
     });
 });
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection")));
+
+
+builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
+{
+    cfg.AddMaps(typeof(Program).Assembly);
+}).CreateMapper());
 
 
 
@@ -54,9 +62,6 @@ builder.Services.AddScoped<Supabase.Client>(_ =>
         }
     )
 );
-// Add this to your services
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection")));
 
 
 builder.Services.AddScoped<BudgetRepository>();
@@ -66,11 +71,10 @@ builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
-builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
-{
-    cfg.AddMaps(typeof(Program).Assembly);
-}).CreateMapper());
 
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddControllers();
 
@@ -78,9 +82,7 @@ builder.Services.AddControllers();
 
 
 // Register services
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
