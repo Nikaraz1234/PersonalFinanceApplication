@@ -9,6 +9,7 @@ using PersonalFinanceApplication.Repositories;
 using PersonalFinanceApplication.Services;
 using Supabase;
 using AutoMapper;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,16 +20,12 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 // ===== Kestrel Configuration =====
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ConfigureEndpointDefaults(listenOptions =>
+    serverOptions.ListenAnyIP(8080, listenOptions =>
     {
-        listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2;
+        listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
     });
 });
 
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.ListenAnyIP(8080); // Listen on all IPs, port 8080
-});
 
 
 // ===== Services Configuration =====

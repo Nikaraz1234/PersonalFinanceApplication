@@ -13,7 +13,6 @@ COPY --from=build /app/publish .
 
 # Environment variables (no inline comments!)
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:8080
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 ENV DOTNET_EnableDiagnostics=0
 
