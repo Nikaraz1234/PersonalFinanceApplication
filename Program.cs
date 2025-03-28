@@ -25,8 +25,11 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     });
 });
 
-// Use port 8080 (for Docker/Cloud compatibility)
-builder.WebHost.UseUrls("http://*:8080");
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(8080); // Listen on all IPs, port 8080
+});
+
 
 // ===== Services Configuration =====
 builder.Services.AddCors(options =>
@@ -123,7 +126,7 @@ app.MapGet("/test", async (NpgsqlDataSource db) =>
     return Results.Ok(await cmd.ExecuteScalarAsync());
 });
 
-// Controllers & Auth
+// Controllers & Auth   
 
 
 app.Run();
