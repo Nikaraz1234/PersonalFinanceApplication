@@ -118,11 +118,6 @@ app.MapControllers();
 // Minimal API Endpoints
 app.MapGet("/", () => "API is running");
 app.MapGet("/healthz", () => Results.Ok("Healthy"));
-app.MapGet("/test", async (NpgsqlDataSource db) =>
-{
-    await using var cmd = db.CreateCommand("SELECT 1");
-    return Results.Ok(await cmd.ExecuteScalarAsync());
-});
 
 // Controllers & Auth   
 
