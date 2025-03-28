@@ -8,9 +8,9 @@ namespace PersonalFinanceApplication.Services
 {
     public class TransactionService : ITransactionService
     {
-        private readonly TransactionRepository _repo;
+        private readonly ITransactionRepository _repo;
 
-        public TransactionService(TransactionRepository repo)
+        public TransactionService(ITransactionRepository repo)
         {
             _repo = repo;
         }
