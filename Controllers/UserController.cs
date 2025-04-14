@@ -65,6 +65,11 @@ namespace PersonalFinanceApplication.Controllers
             catch (EmailAlreadyExistsException ex)
             {
                 return BadRequest(ex.Message);
+
+            }
+            catch (Exception ex) 
+            {
+                return StatusCode(500, "An error occurred while registering the user");
             }
         }
 

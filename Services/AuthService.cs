@@ -40,7 +40,7 @@ namespace PersonalFinanceApplication.Services
             return user;
         }
 
-        public async Task<User> RegisterAsync(UserRegisterDTO userDto)
+        public async Task<AuthResponseDto> RegisterAsync(UserRegisterDTO userDto)
         {
             var user = _automapper.Map<User>(userDto);
             if (await UserExistsAsync(user.Email))
@@ -50,7 +50,9 @@ namespace PersonalFinanceApplication.Services
 
             user.PasswordHash = _passwordHasher.HashPassword(userDto.Password);
             await _userRepository.AddAsync(user);
-            return user;
+
+            var authResponse = _automapper.Map<AuthResponseDto>(user);
+            return authResponse;
             
 
         }
@@ -70,17 +72,17 @@ namespace PersonalFinanceApplication.Services
         public async Task ResetPasswordAsync(ResetPasswordDto dto)
         {
  
-            // Find user by email
+
             var user = await _userRepository.GetByEmailAsync(dto.Email);
 
-            // Security: Return same success message whether user exists or not
+
             if (user == null || !ValidateResetToken(user, dto.Token))
             {
-                await Task.Delay(new Random().Next(200, 500)); // Prevent timing attacks
+                await Task.Delay(new Random().Next(200, 500));
                 return;
             }
 
-            // Update password
+
             user.PasswordHash = _passwordHasher.HashPassword(dto.NewPassword);
             user.PasswordResetToken = null;
             user.PasswordResetExpires = null;
@@ -88,6 +90,8 @@ namespace PersonalFinanceApplication.Services
             await _userRepository.UpdateAsync(user);
 
         }
+
+
         private bool ValidateResetToken(User user, string token)
         {
             return user.PasswordResetToken == token

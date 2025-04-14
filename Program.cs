@@ -11,14 +11,16 @@ using Supabase;
 using AutoMapper;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===== Configuration =====
+
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-// ===== Kestrel Configuration =====
+
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.ListenAnyIP(8080, listenOptions =>
@@ -37,7 +39,7 @@ builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
 
 
 
-// ===== Services Configuration =====
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -47,7 +49,7 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
-// Supabase Client (PostgreSQL)
+
 var supabaseUrl = builder.Configuration["Supabase:Url"] ?? throw new ArgumentNullException("Supabase:Url");
 var supabaseKey = builder.Configuration["Supabase:Key"] ?? throw new ArgumentNullException("Supabase:Key");
 
@@ -81,7 +83,7 @@ builder.Services.AddControllers();
 
 
 
-// Register services
+
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -97,26 +99,82 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 builder.WebHost.UseSetting(WebHostDefaults.ServerUrlsKey, string.Empty);
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Personal Finance API",
+        Version = "v1",
+        Description = "API for managing personal finances",
+        Contact = new OpenApiContact
+        {
+            Name = "Your Name",
+            Email = "your.email@example.com"
+        }
+    });
+
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+});
 
 
 var app = builder.Build();
 
-// ===== Middleware Pipeline =====
 
-// Security headers (recommended)
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Personal Finance API v1");
+        c.RoutePrefix = "swagger";
+    });
+}
+
+
 app.UseForwardedHeaders();
 
-// Swagger (only in Development)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 app.UseRouting();
-app.UseCors("AllowAll"); // Must be after UseRouting()
+app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
-// Minimal API Endpoints
+
 app.MapGet("/", () => "API is running");
 app.MapGet("/healthz", () => Results.Ok("Healthy"));
 app.MapGet("/db-check", async ([FromServices] AppDbContext dbContext) =>
@@ -132,7 +190,7 @@ app.MapGet("/db-check", async ([FromServices] AppDbContext dbContext) =>
     }
 });
 
-// Controllers & Auth   
+
 
 
 app.Run();

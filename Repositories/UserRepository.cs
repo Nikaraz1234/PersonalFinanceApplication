@@ -75,6 +75,11 @@ namespace PersonalFinanceApplication.Repositories
         {
             return await _context.Users.AnyAsync(u => u.Email == email);
         }
+        public async Task<User> GetUserByCredentialsAsync(string email, string passwordHash)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == email && u.PasswordHash == passwordHash);
+        }
 
         public async Task<User> GetUserWithBudgetsAsync(int id)
         {
