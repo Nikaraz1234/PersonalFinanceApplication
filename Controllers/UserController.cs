@@ -105,17 +105,18 @@ namespace PersonalFinanceApplication.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var userdto = _userService.GetUserByEmailAsync(loginDto.Email);
-            var user = _automapper.Map<User>(userdto);
+            var userDto = await _userService.GetUserByEmailAsync(loginDto.Email);
+            var user = _automapper.Map<User>(userDto);
+
             if (user == null || !_passwordHasher.VerifyPassword(user.PasswordHash, loginDto.Password))
                 return BadRequest("Invalid email or password.");
 
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Username)
-            };
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.Name, user.Username)
+    };
 
             var identity = new ClaimsIdentity(claims, "MyCookieAuth");
             var principal = new ClaimsPrincipal(identity);
