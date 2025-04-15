@@ -4,6 +4,7 @@ using PersonalFinanceApplication.DTOs.Users;
 using PersonalFinanceApplication.DTOs.Auth;
 using PersonalFinanceApplication.Interfaces;
 using PersonalFinanceApplication.Exceptions;
+using PersonalFinanceApplication.Services;
 
 namespace PersonalFinanceApplication.Controllers
 {
@@ -13,11 +14,12 @@ namespace PersonalFinanceApplication.Controllers
     {
         private readonly IUserService _userService;
         private readonly IAuthService _authService;
-
-        public UsersController(IUserService userService, IAuthService authService)
+        private readonly ILogger<AuthService> _logger;
+        public UsersController(IUserService userService, IAuthService authService, ILogger<AuthService> logger)
         {
             _userService = userService;
             _authService = authService;
+            _logger = logger;
         }
 
 
@@ -57,19 +59,34 @@ namespace PersonalFinanceApplication.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register([FromBody] UserRegisterDTO registerDto)
         {
+            _logger.LogInformation("Received registration request for {Email}", registerDto.Email);
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state for registration: {@ModelState}", ModelState);
+                return BadRequest("Invalid input data.");
+            }
             try
             {
                 var authResponse = await _authService.RegisterAsync(registerDto);
+                _logger.LogInformation("Registration completed successfully for {Email}", registerDto.Email);
                 return CreatedAtAction(nameof(GetUser), new { id = authResponse.Id }, authResponse);
             }
-            catch (EmailAlreadyExistsException ex)
+            catch (AuthException ex)
             {
+                _logger.LogWarning("Registration rejected: {Message}", ex.Message);
                 return BadRequest(ex.Message);
-
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while registering the user");
+                _logger.LogError(ex, "Unexpected error during registration for {Email}", registerDto.Email);
+
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError("Inner exception details: {InnerExceptionMessage}", ex.InnerException.Message);
+                    _logger.LogError("Inner exception stack trace: {InnerStackTrace}", ex.InnerException.StackTrace);
+                }
+
+                return StatusCode(500, $"Registration failed: {ex.Message}");
             }
         }
 

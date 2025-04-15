@@ -15,10 +15,10 @@ namespace PersonalFinanceApplication.Models
         public string Username { get; set; }
 
         [MaxLength(100)]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
 
         [MaxLength(100)]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastLogin { get; set; }
@@ -29,7 +29,7 @@ namespace PersonalFinanceApplication.Models
         public ICollection<SavingsPot> SavingsPots { get; set; }
         public ICollection<RecurringBill> RecurringBills { get; set; }
 
-        public string PasswordResetToken { get; set; }
+        public string PasswordResetToken { get; set; } = string.Empty;
         public DateTime? PasswordResetExpires { get; set; }
     }
 }

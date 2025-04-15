@@ -5,9 +5,10 @@ namespace PersonalFinanceApplication.DTOs.Auth
     public class AuthResponseDto
     {
         public int Id { get; set; }
-        public UserDTO User { get; set; }
+        public string Email { get; set; }
+        public string Username { get; set; }
+        public DateTime CreatedAt { get; set; }
         public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
-        public DateTime ExpiresAt { get; set; }
+        public DateTime TokenExpiry { get; set; }
     }
 }

@@ -1,3 +1,11 @@
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.csproj.AssemblyReference.cache
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.AssemblyInfoInputs.cache
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.AssemblyInfo.cs
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.csproj.CoreCompileInputs.cache
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.sourcelink.json
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\appsettings.json
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\PersonalFinanceApplication.staticwebassets.endpoints.json
@@ -6,7 +14,11 @@ C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplicatio
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\PersonalFinanceApplication.runtimeconfig.json
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\PersonalFinanceApplication.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\PersonalFinanceApplication.pdb
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\AutoMapper.dll
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\BCrypt.Net-Next.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Humanizer.dll
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
@@ -20,6 +32,8 @@ C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplicatio
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.IO.RecyclableMemoryStream.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\Microsoft.OpenApi.dll
@@ -99,14 +113,6 @@ C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplicatio
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
-C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.csproj.AssemblyReference.cache
-C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.AssemblyInfoInputs.cache
-C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.AssemblyInfo.cs
-C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.csproj.CoreCompileInputs.cache
-C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.sourcelink.json
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\scopedcss\bundle\PersonalFinanceApplication.styles.css
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\staticwebassets.development.json
@@ -123,6 +129,3 @@ C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplicatio
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.pdb
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\PersonalFinanceApplication.genruntimeconfig.cache
 C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\obj\Debug\net8.0\ref\PersonalFinanceApplication.dll
-C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\AutoMapper.dll
-C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
-C:\Users\razma\source\repos\PersonalFinanceApplication\PersonalFinanceApplication\bin\Debug\net8.0\BCrypt.Net-Next.dll

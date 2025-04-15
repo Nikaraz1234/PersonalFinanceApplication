@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PersonalFinanceApplication.Data;
 using PersonalFinanceApplication.DTOs.Auth;
 using PersonalFinanceApplication.DTOs.Users;
+using PersonalFinanceApplication.Exceptions;
 using PersonalFinanceApplication.Interfaces;
 using PersonalFinanceApplication.Models;
 
@@ -37,11 +38,17 @@ namespace PersonalFinanceApplication.Repositories
 
         public async Task AddAsync(User user)
         {
+            try
+            {
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new AuthException("Database error occurred. Please check unique constraints or data formats.");
+            }
 
 
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-            
         }
 
         public async Task<User> GetByUsernameAsync(string username)
@@ -65,7 +72,6 @@ namespace PersonalFinanceApplication.Repositories
                 await _context.SaveChangesAsync();
             }
         }
-
         public async Task<bool> Exists(int id)
         {
             return await _context.Users.AnyAsync(u => u.Id == id);
@@ -73,8 +79,14 @@ namespace PersonalFinanceApplication.Repositories
 
         public async Task<bool> EmailExists(string email)
         {
-            return await _context.Users.AnyAsync(u => u.Email == email);
+            return await _context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower());
         }
+
+        public async Task<bool> Exists(string username)
+        {
+            return await _context.Users.AnyAsync(u => u.Username.ToLower() == username.ToLower());
+        }
+
         public async Task<User> GetUserByCredentialsAsync(string email, string passwordHash)
         {
             return await _context.Users

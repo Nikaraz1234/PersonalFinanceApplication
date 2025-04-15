@@ -13,6 +13,10 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,7 +35,8 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("SupabaseConnection")));
 
-
+builder.Services.AddTransient<NpgsqlConnection>(_ =>
+    new NpgsqlConnection(builder.Configuration.GetConnectionString("SupabaseConnection")));
 builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
 {
     cfg.AddMaps(typeof(Program).Assembly);
@@ -65,7 +70,24 @@ builder.Services.AddScoped<Supabase.Client>(_ =>
         }
     )
 );
-
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+            ),
+            AlgorithmValidator = (algo, _, _, _) =>
+                algo == SecurityAlgorithms.HmacSha256
+        };
+    });
 
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
@@ -73,6 +95,8 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -89,7 +113,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.All;
@@ -98,6 +121,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 builder.WebHost.UseSetting(WebHostDefaults.ServerUrlsKey, string.Empty);
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -162,7 +186,22 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseExceptionHandler(exceptionHandlerApp =>
+{
+    exceptionHandlerApp.Run(async context =>
+    {
+        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        var ex = exceptionHandlerPathFeature?.Error;
 
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new
+        {
+            Error = ex?.Message,
+            Detail = ex?.InnerException?.Message,
+            StackTrace = app.Environment.IsDevelopment() ? ex?.StackTrace : null
+        });
+    });
+});
 app.UseForwardedHeaders();
 
 if (app.Environment.IsDevelopment())
@@ -172,6 +211,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseRouting();
 app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

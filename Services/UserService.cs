@@ -62,7 +62,7 @@ namespace PersonalFinanceApplication.Services
 
             return new AuthResponseDto
             {
-                User = _mapper.Map<UserDTO>(user),
+     
                 // Token generation would happen here
             };
         }

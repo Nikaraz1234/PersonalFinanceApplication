@@ -12,6 +12,7 @@ namespace PersonalFinanceApplication.Interfaces
         Task UpdateAsync(User user);
         Task DeleteAsync(int id);
 
+        Task<bool> Exists(string user);
         Task<bool> Exists(int id);
         Task<bool> EmailExists(string email);
 
