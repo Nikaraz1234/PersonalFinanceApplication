@@ -46,6 +46,11 @@ namespace PersonalFinanceApplication.Services
             var user = await _userRepository.GetByUsernameAsync(username);
             return _mapper.Map<UserDTO>(user);
         }
+        public async Task<UserDTO> GetUserByEmailAsync(string email)
+        {
+            var user = await _userRepository.GetByEmailAsync(email);
+            return _mapper.Map<UserDTO>(user);
+        }
         public async Task<UserSummaryDTO> GetUserSummaryAsync(int userId)
         {
             var user = await _userRepository.GetByIdAsync(userId);

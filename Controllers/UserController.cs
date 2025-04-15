@@ -5,6 +5,10 @@ using PersonalFinanceApplication.DTOs.Auth;
 using PersonalFinanceApplication.Interfaces;
 using PersonalFinanceApplication.Exceptions;
 using PersonalFinanceApplication.Services;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using AutoMapper;
+using PersonalFinanceApplication.Models;
 
 namespace PersonalFinanceApplication.Controllers
 {
@@ -15,11 +19,15 @@ namespace PersonalFinanceApplication.Controllers
         private readonly IUserService _userService;
         private readonly IAuthService _authService;
         private readonly ILogger<AuthService> _logger;
-        public UsersController(IUserService userService, IAuthService authService, ILogger<AuthService> logger)
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly IMapper _automapper;
+        public UsersController(IUserService userService, IAuthService authService, ILogger<AuthService> logger, IPasswordHasher passwordHasher, IMapper automapper)
         {
             _userService = userService;
             _authService = authService;
             _logger = logger;
+            _passwordHasher = passwordHasher;
+            _automapper = automapper;
         }
 
 
@@ -90,6 +98,44 @@ namespace PersonalFinanceApplication.Controllers
             }
         }
 
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginDTO loginDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userdto = _userService.GetUserByEmailAsync(loginDto.Email);
+            var user = _automapper.Map<User>(userdto);
+            if (user == null || !_passwordHasher.VerifyPassword(user.PasswordHash, loginDto.Password))
+                return BadRequest("Invalid email or password.");
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.Username)
+            };
+
+            var identity = new ClaimsIdentity(claims, "MyCookieAuth");
+            var principal = new ClaimsPrincipal(identity);
+
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+            };
+
+            await HttpContext.SignInAsync("MyCookieAuth", principal, authProperties);
+
+            return Ok("Logged in successfully");
+        }
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("MyCookieAuth");
+            return Ok("Logged out");
+        }
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

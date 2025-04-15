@@ -13,6 +13,7 @@ namespace PersonalFinanceApplication.Interfaces
         Task<IEnumerable<UserSummaryDTO>> GetAllUsersAsync();
         Task<UserSummaryDTO> GetUserSummaryAsync(int userId);
         Task<UserDTO> GetUserByUsernameAsync(string username);
+        Task<UserDTO> GetUserByEmailAsync(string email);
         /* Registration & Profile */
         Task<AuthResponseDto> RegisterAsync(UserRegisterDTO registerDto);
         Task<UserDTO> UpdateUserAsync(int id, UserUpdateDTO updateDto);
