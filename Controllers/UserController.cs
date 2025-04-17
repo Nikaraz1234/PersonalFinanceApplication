@@ -136,8 +136,9 @@ namespace PersonalFinanceApplication.Controllers
 
                 return Ok(new
                 {
+                    Token = token,
                     User = new { user.Id, user.Username, user.Email },
-                    // Optionally return metadata without the token
+
                     ExpiresIn = _jwtSettings.ExpirationMinutes * 60
                 });
             }

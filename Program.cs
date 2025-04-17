@@ -47,18 +47,16 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"))
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("SecureCors", policy =>
+    options.AddPolicy("AllowAllWithCredentials", policy =>
     {
-        policy.WithOrigins(
-                "https://personalfinanceapplication.onrender.com", // Production
-                "http://localhost:3000",                          // Local dev
-                "https://localhost:3000"                          // For local HTTPS
-              )
+        policy.SetIsOriginAllowed(_ => true) // Allow any origin
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // Required for cookies
+              .AllowCredentials()
+              .SetPreflightMaxAge(TimeSpan.FromSeconds(86400)); // Cache preflight
     });
 });
+
 
 
 
