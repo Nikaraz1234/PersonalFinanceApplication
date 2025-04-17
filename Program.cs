@@ -45,12 +45,6 @@ builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
 
-builder.Services.AddOptions<JwtSettings>()
-    .Bind(builder.Configuration.GetSection("Jwt"))
-    .ValidateDataAnnotations()
-    .Validate(jwt => !string.IsNullOrEmpty(jwt.Secret), "Secret is required");
-
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>

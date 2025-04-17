@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using PersonalFinanceApplication.DTOs.Auth;
 using PersonalFinanceApplication.DTOs.Users;
@@ -25,14 +26,14 @@ namespace PersonalFinanceApplication.Services
         private readonly ITokenService _tokenService;
         private readonly JwtSettings _jwtSettings;
 
-        public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, IMapper automapper, ILogger<AuthService> logger, ITokenService tokenService, JwtSettings jwtSettings)
+        public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, IMapper automapper, ILogger<AuthService> logger, ITokenService tokenService, IOptions<JwtSettings> jwtSettings)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _passwordHasher = passwordHasher;
             _automapper = automapper;
             _logger = logger;
             _tokenService = tokenService;
-            _jwtSettings = jwtSettings;
+            _jwtSettings = jwtSettings.Value;
         }
         public string GenerateJwtToken(User user)
         {
