@@ -129,7 +129,7 @@ namespace PersonalFinanceApplication.Controllers
                 {
                     HttpOnly = true,
                     Secure = false,
-                    SameSite = SameSiteMode.None,
+                    SameSite = SameSiteMode.Lax,
                     Expires = DateTime.UtcNow.AddDays(7),
                     Domain = GetCookieDomain()
                 });
