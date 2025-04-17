@@ -42,9 +42,13 @@ builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
 {
     cfg.AddMaps(typeof(Program).Assembly);
 }).CreateMapper());
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
 
+builder.Services.AddOptions<JwtSettings>()
+    .Bind(builder.Configuration.GetSection("Jwt"))
+    .ValidateDataAnnotations()
+    .Validate(jwt => !string.IsNullOrEmpty(jwt.Secret), "Secret is required");
 
 
 builder.Services.AddCors(options =>
@@ -75,21 +79,21 @@ builder.Services.AddScoped<Supabase.Client>(_ =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
-            ),
-            AlgorithmValidator = (algo, _, _, _) =>
-                algo == SecurityAlgorithms.HmacSha256
+                Encoding.UTF8.GetBytes(jwtSettings.Secret)
+            )
         };
     });
+
 
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
