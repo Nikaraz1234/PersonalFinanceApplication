@@ -128,10 +128,10 @@ namespace PersonalFinanceApplication.Controllers
                 Response.Cookies.Append("access_token", token, new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Only send over HTTPS
+                    Secure = true, 
                     SameSite = SameSiteMode.Strict,
                     Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
-                    Domain = GetCookieDomain() // Custom method for env-specific domains
+                    Domain = GetCookieDomain() 
                 });
 
                 return Ok(new
@@ -144,7 +144,7 @@ namespace PersonalFinanceApplication.Controllers
             }
             catch (NotFoundException)
             {
-                await Task.Delay(Random.Shared.Next(200, 500)); // Prevent timing attacks
+                await Task.Delay(Random.Shared.Next(200, 500));
                 return Unauthorized(new { Message = "Invalid email or password" });
             }
             catch (InvalidCredentialsException)
@@ -156,9 +156,9 @@ namespace PersonalFinanceApplication.Controllers
 
         private string? GetCookieDomain()
         {
-            return Request.Host.Host.Contains("localhost")
-                ? null
-                : ".yourdomain.com"; // Leading dot for subdomains
+            if (Request.Host.Host.Contains("localhost"))
+                return null;
+            return "personalfinanceapplication.onrender.com"; 
         }
         [HttpPost("logout")]
         [Authorize]
