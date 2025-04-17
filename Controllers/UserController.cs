@@ -129,7 +129,9 @@ namespace PersonalFinanceApplication.Controllers
                 {
                     HttpOnly = true,
                     Secure = false,
-                    SameSite = SameSiteMode.Lax,
+                    SameSite = Request.Host.Host.Contains("localhost")
+            ? SameSiteMode.Unspecified
+            : SameSiteMode.Lax,
                     Expires = DateTime.UtcNow.AddDays(7),
                     Domain = GetCookieDomain()
                 });
@@ -156,9 +158,10 @@ namespace PersonalFinanceApplication.Controllers
 
         private string? GetCookieDomain()
         {
-            if (Request.Host.Host.Contains("localhost"))
-                return null;
-            return "personalfinanceapplication.onrender.com"; 
+            var host = Request.Host.Host;
+            return host.Contains("localhost") || host.Contains("127.0.0.1")
+                ? null
+                : "personalfinanceapplication.onrender.com";
         }
         [HttpPost("logout")]
         [Authorize]
