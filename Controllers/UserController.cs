@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using AutoMapper;
 using PersonalFinanceApplication.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PersonalFinanceApplication.Controllers
 {
@@ -126,7 +127,7 @@ namespace PersonalFinanceApplication.Controllers
     };
 
             var token = _authService.GenerateJwtToken(user);
-
+            user.LastLogin = DateTime.Now;
             // Return token in response
             return Ok(new
             {
@@ -140,10 +141,13 @@ namespace PersonalFinanceApplication.Controllers
             });
         }
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
+        [Authorize] 
+        public IActionResult Logout()
         {
-            await HttpContext.SignOutAsync("MyCookieAuth");
-            return Ok("Logged out");
+            return Ok(new
+            {
+                Message = "Successfully logged out."
+            });
         }
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
