@@ -47,15 +47,25 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"))
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllWithCredentials", policy =>
+    options.AddDefaultPolicy(policy =>
     {
-        policy.SetIsOriginAllowed(_ => true) // Allow any origin
+        policy.WithOrigins(
+                "https://personalfinanceapplication.onrender.com",
+                "http://localhost:3000",
+                "https://localhost:3000"
+              )
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials()
-              .SetPreflightMaxAge(TimeSpan.FromSeconds(86400)); // Cache preflight
+              .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
+
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.SetIsOriginAllowed(_ => true);
+        }
     });
 });
+
 
 
 
@@ -224,7 +234,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseCors("AllowAll");
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
