@@ -10,6 +10,9 @@ using System.Security.Claims;
 using AutoMapper;
 using PersonalFinanceApplication.Models;
 using Microsoft.AspNetCore.Authorization;
+using PersonalFinanceApplication.Repositories;
+using Microsoft.Extensions.Options;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace PersonalFinanceApplication.Controllers
 {
@@ -22,13 +25,15 @@ namespace PersonalFinanceApplication.Controllers
         private readonly ILogger<AuthService> _logger;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _automapper;
-        public UsersController(IUserService userService, IAuthService authService, ILogger<AuthService> logger, IPasswordHasher passwordHasher, IMapper automapper)
+        private readonly JwtSettings _jwtSettings;
+        public UsersController(IUserService userService, IAuthService authService, ILogger<AuthService> logger, IPasswordHasher passwordHasher, IMapper automapper, IOptions<JwtSettings> jwtSettings)
         {
             _userService = userService;
             _authService = authService;
             _logger = logger;
             _passwordHasher = passwordHasher;
             _automapper = automapper;
+            _jwtSettings = jwtSettings.Value;
         }
 
 
@@ -103,51 +108,70 @@ namespace PersonalFinanceApplication.Controllers
         public async Task<IActionResult> Login([FromBody] UserLoginDTO loginDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(new { Message = "Invalid request format" });
 
-            User user;
             try
             {
-                user = await _authService.AuthenticateAsync(loginDto.Email, loginDto.Password);
+                var user = await _authService.AuthenticateAsync(loginDto.Email, loginDto.Password);
+
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+
+                var token = _authService.GenerateJwtToken(user);
+                user.LastLogin = DateTime.UtcNow;
+                var id = user.Id;
+                Response.Cookies.Append("access_token", token, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // Only send over HTTPS
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
+                    Domain = GetCookieDomain() // Custom method for env-specific domains
+                });
+
+                return Ok(new
+                {
+                    User = new { user.Id, user.Username, user.Email },
+                    // Optionally return metadata without the token
+                    ExpiresIn = _jwtSettings.ExpirationMinutes * 60
+                });
             }
             catch (NotFoundException)
             {
-                return BadRequest("Invalid email or password.");
+                await Task.Delay(Random.Shared.Next(200, 500)); // Prevent timing attacks
+                return Unauthorized(new { Message = "Invalid email or password" });
             }
             catch (InvalidCredentialsException)
             {
-                return BadRequest("Invalid email or password.");
+                await Task.Delay(Random.Shared.Next(200, 500));
+                return Unauthorized(new { Message = "Invalid email or password" });
             }
+        }
 
-            var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Name, user.Username),
-    };
-
-            var token = _authService.GenerateJwtToken(user);
-            user.LastLogin = DateTime.Now;
-            // Return token in response
-            return Ok(new
-            {
-                Token = token,
-                User = new
-                {
-                    user.Id,
-                    user.Username,
-                    user.Email,
-                }
-            });
+        private string? GetCookieDomain()
+        {
+            return Request.Host.Host.Contains("localhost")
+                ? null
+                : ".yourdomain.com"; // Leading dot for subdomains
         }
         [HttpPost("logout")]
-        [Authorize] 
+        [Authorize]
         public IActionResult Logout()
         {
-            return Ok(new
+            Response.Cookies.Delete("access_token", new CookieOptions
             {
-                Message = "Successfully logged out."
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Domain = GetCookieDomain()
             });
+
+            return Ok(new { Message = "Successfully logged out" });
         }
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
