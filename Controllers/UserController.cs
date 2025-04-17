@@ -130,10 +130,11 @@ namespace PersonalFinanceApplication.Controllers
                     HttpOnly = true,
                     Secure = false,
                     SameSite = Request.Host.Host.Contains("localhost")
-            ? SameSiteMode.Unspecified
-            : SameSiteMode.Lax,
+                    ? SameSiteMode.Unspecified
+                    : SameSiteMode.Lax,
                     Expires = DateTime.UtcNow.AddDays(7),
-                    Domain = GetCookieDomain()
+                    Domain = GetCookieDomain(),
+                    Path = "/"
                 });
 
                 return Ok(new
