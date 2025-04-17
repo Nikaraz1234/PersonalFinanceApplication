@@ -47,14 +47,19 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"))
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("SecureCors", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
+        policy.WithOrigins(
+                "https://personalfinanceapplication.onrender.com", // Production
+                "http://localhost:3000",                          // Local dev
+                "https://localhost:3000"                          // For local HTTPS
+              )
               .AllowAnyHeader()
-              .AllowCredentials();
+              .AllowAnyMethod()
+              .AllowCredentials(); // Required for cookies
     });
 });
+
 
 
 var supabaseUrl = builder.Configuration["Supabase:Url"] ?? throw new ArgumentNullException("Supabase:Url");
