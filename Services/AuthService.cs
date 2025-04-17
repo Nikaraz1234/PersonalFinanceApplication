@@ -1,12 +1,17 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PersonalFinanceApplication.DTOs.Auth;
 using PersonalFinanceApplication.DTOs.Users;
 using PersonalFinanceApplication.Exceptions;
 using PersonalFinanceApplication.Interfaces;
 using PersonalFinanceApplication.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.CompilerServices;
 using System.Security.Authentication;
+using System.Security.Claims;
+using System.Text;
 
 namespace PersonalFinanceApplication.Services
 {
@@ -18,20 +23,44 @@ namespace PersonalFinanceApplication.Services
         private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _automapper;
         private readonly ITokenService _tokenService;
+        private readonly JwtSettings _jwtSettings;
 
-
-        public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, IMapper automapper, ILogger<AuthService> logger, ITokenService tokenService)
+        public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, IMapper automapper, ILogger<AuthService> logger, ITokenService tokenService, JwtSettings jwtSettings)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _passwordHasher = passwordHasher;
             _automapper = automapper;
             _logger = logger;
             _tokenService = tokenService;
+            _jwtSettings = jwtSettings;
+        }
+        public string GenerateJwtToken(User user)
+        {
+            var claims = new[]
+            {
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         public async Task<User> AuthenticateAsync(string email, string password)
         {
-            var user = await _userRepository.GetByEmailAsync(email);
+            var user = await _userRepository.GetByEmailAsync(email.Trim().ToLower());
 
             if (user == null)
             {

@@ -98,38 +98,46 @@ namespace PersonalFinanceApplication.Controllers
             }
         }
 
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginDTO loginDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var userDto = await _userService.GetUserByEmailAsync(loginDto.Email);
-            var user = _automapper.Map<User>(userDto);
-
-            if (user == null || !_passwordHasher.VerifyPassword(user.PasswordHash, loginDto.Password))
+            User user;
+            try
+            {
+                user = await _authService.AuthenticateAsync(loginDto.Email, loginDto.Password);
+            }
+            catch (NotFoundException)
+            {
                 return BadRequest("Invalid email or password.");
+            }
+            catch (InvalidCredentialsException)
+            {
+                return BadRequest("Invalid email or password.");
+            }
 
             var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Name, user.Username)
+        new Claim(ClaimTypes.Name, user.Username),
     };
 
-            var identity = new ClaimsIdentity(claims, "MyCookieAuth");
-            var principal = new ClaimsPrincipal(identity);
+            var token = _authService.GenerateJwtToken(user);
 
-            var authProperties = new AuthenticationProperties
+            // Return token in response
+            return Ok(new
             {
-                IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
-            };
-
-            await HttpContext.SignInAsync("MyCookieAuth", principal, authProperties);
-
-            return Ok("Logged in successfully");
+                Token = token,
+                User = new
+                {
+                    user.Id,
+                    user.Username,
+                    user.Email,
+                }
+            });
         }
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()

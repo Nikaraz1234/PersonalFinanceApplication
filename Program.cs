@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using PersonalFinanceApplication.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +42,7 @@ builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
 {
     cfg.AddMaps(typeof(Program).Assembly);
 }).CreateMapper());
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 
 
@@ -122,7 +124,12 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 builder.WebHost.UseSetting(WebHostDefaults.ServerUrlsKey, string.Empty);
 
-
+builder.Services.AddAuthentication("MyCookieAuth")
+    .AddCookie("MyCookieAuth", options =>
+    {
+        options.LoginPath = "/login";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -210,6 +217,7 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
     c.RoutePrefix = "swagger";
 });
+
 
 app.UseHttpsRedirection();
 app.UseRouting();

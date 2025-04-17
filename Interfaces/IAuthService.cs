@@ -9,6 +9,7 @@ namespace PersonalFinanceApplication.Interfaces
         Task<User> AuthenticateAsync(string username, string password);
         Task<AuthResponseDto> RegisterAsync(UserRegisterDTO user);
         Task<bool> UserExistsAsync(string username);
+        public string GenerateJwtToken(User user);
         Task ChangePasswordAsync(string username, string oldPassword, string newPassword);
         Task ResetPasswordAsync(ResetPasswordDto dto);
 
