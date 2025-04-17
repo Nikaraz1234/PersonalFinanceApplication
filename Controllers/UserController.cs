@@ -128,10 +128,10 @@ namespace PersonalFinanceApplication.Controllers
                 Response.Cookies.Append("access_token", token, new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, 
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
-                    Domain = GetCookieDomain() 
+                    Secure = false,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    Domain = GetCookieDomain()
                 });
 
                 return Ok(new
