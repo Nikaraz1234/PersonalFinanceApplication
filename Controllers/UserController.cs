@@ -208,38 +208,6 @@ namespace PersonalFinanceApplication.Controllers
             }
         }
 
-        /// <summary>
-        /// Initiate password reset
-        /// </summary>
-
-        /*
-        [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
-        {
-            await _authService.ResetPasswordAsync(dto);
-            return Ok(); // Always return OK for security
-        }
-        */
-        /// Complete password reset
-        [HttpPost("reset-password")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                await _authService.ResetPasswordAsync(dto);
-                return Ok(new { Message = "Password reset successfully" });
-            }
-            catch (Exception ex)
-            {
-
-                return BadRequest(new { Message = "Error processing request" });
-            }
-        }
     }
 }
 
