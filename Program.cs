@@ -50,21 +50,22 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy.WithOrigins(
-                "https://personalfinanceapplication.onrender.com",
-                "http://localhost:3000",
-                "https://localhost:3000"
+                "http://localhost:3000",  // Frontend dev URL
+                "https://localhost:3000"  // If frontend uses HTTPS locally
               )
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials()
+              .AllowCredentials()  // Required for cookies
               .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
 
+        // Allow any origin in development (for flexibility)
         if (builder.Environment.IsDevelopment())
         {
             policy.SetIsOriginAllowed(_ => true);
         }
     });
 });
+
 
 
 

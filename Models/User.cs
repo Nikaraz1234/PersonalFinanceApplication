@@ -23,7 +23,6 @@ namespace PersonalFinanceApplication.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastLogin { get; set; }
 
-        // Navigation properties
         public ICollection<Budget> Budgets { get; set; }
         public ICollection<Transaction> Transactions { get; set; }
         public ICollection<SavingsPot> SavingsPots { get; set; }

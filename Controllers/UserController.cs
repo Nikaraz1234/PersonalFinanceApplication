@@ -113,35 +113,27 @@ namespace PersonalFinanceApplication.Controllers
             try
             {
                 var user = await _authService.AuthenticateAsync(loginDto.Email, loginDto.Password);
-
-                var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
                 var token = _authService.GenerateJwtToken(user);
                 user.LastLogin = DateTime.UtcNow;
-                var id = user.Id;
+
+                
+                bool isLocalhost = Request.Headers["Origin"].ToString().Contains("localhost");
+
                 Response.Cookies.Append("access_token", token, new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = !Request.Host.Host.Contains("localhost"),
-                    SameSite = Request.Host.Host.Contains("localhost")
-                    ? SameSiteMode.Unspecified
-                    : SameSiteMode.Lax,
+                    Secure = !isLocalhost,
+                    SameSite = isLocalhost ? SameSiteMode.None : SameSiteMode.Lax,
                     Expires = DateTime.UtcNow.AddDays(7),
-                    Domain = GetCookieDomain(),
-                    Path = "/"
+                    Domain = isLocalhost ? null : "personalfinanceapplication.onrender.com", 
+                    Path = "/",
+                    IsEssential = true 
                 });
 
                 return Ok(new
                 {
                     Token = token,
                     User = new { user.Id, user.Username, user.Email },
-
                     ExpiresIn = _jwtSettings.ExpirationMinutes * 60
                 });
             }
@@ -155,6 +147,7 @@ namespace PersonalFinanceApplication.Controllers
                 await Task.Delay(Random.Shared.Next(200, 500));
                 return Unauthorized(new { Message = "Invalid email or password" });
             }
+        }
         }
 
         private string? GetCookieDomain()
