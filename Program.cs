@@ -106,11 +106,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IRecurringBillRepository, RecurringBillRepository>();
+builder.Services.AddScoped<IBudgetCategoryRepository, BudgetCategoryRepository>();
+
 
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IBudgetCategoryService, BudgetCategoryService>();
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
+builder.Services.AddScoped<IRecurringBillService, RecurringBillsService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<IUserService, UserService>();

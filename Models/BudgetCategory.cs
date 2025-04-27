@@ -22,5 +22,7 @@ namespace PersonalFinanceApplication.Models
 
         public int BudgetId { get; set; }
         public Budget Budget { get; set; }
+
+        public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
 }

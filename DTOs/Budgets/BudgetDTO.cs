@@ -1,4 +1,5 @@
 ﻿using PersonalFinanceApplication.DTOs.Budgets.Categories;
+using PersonalFinanceApplication.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace PersonalFinanceApplication.DTOs.Budgets
@@ -6,7 +7,8 @@ namespace PersonalFinanceApplication.DTOs.Budgets
     public class BudgetDTO
     {
         public int Id { get; set; }
-
+        public int UserId { get; set; }
+        public User User { get; set; }
         [Required]
         [StringLength(100, ErrorMessage = "Budget name must be under 100 characters")]
         public string Name { get; set; }

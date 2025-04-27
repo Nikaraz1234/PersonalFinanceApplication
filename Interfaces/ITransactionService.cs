@@ -1,14 +1,16 @@
-﻿using PersonalFinanceApplication.DTOs;
+﻿using PersonalFinanceApplication.DTOs.Transaction;
 using PersonalFinanceApplication.Models;
 
 namespace PersonalFinanceApplication.Interfaces
 {
     public interface ITransactionService
     {
-        Task<Transaction> GetTransactionByIdAsync(int id);
-        Task<IEnumerable<Transaction>> GetAllTransactionsAsync(int userId, int page = 1, int pageSize = 10);
-        Task<Transaction> CreateTransactionAsync(Transaction transaction);
-        Task<Transaction> UpdateTransactionAsync(int id, TransactionDTO transactionDto);
-        Task<bool> DeleteTransactionAsync(int id);
+        Task<TransactionDTO> GetTransactionAsync(int id);
+        Task<IEnumerable<TransactionDTO>> GetAllTransactionsAsync();
+        Task<IEnumerable<TransactionDTO>> GetUserTransactionsAsync(int userId);
+        Task<IEnumerable<TransactionDTO>> SearchTransactionsAsync(int userId, string searchTerm, DateTime? startDate, DateTime? endDate, int? categoryId);
+        Task<TransactionDTO> CreateTransactionAsync(CreateTransactionDTO transactionDto);
+        Task<TransactionDTO> UpdateTransactionAsync(UpdateTransactionDTO transactionDto);
+        Task DeleteTransactionAsync(int id);
     }
 }

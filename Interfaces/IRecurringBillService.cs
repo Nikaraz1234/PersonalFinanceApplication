@@ -1,15 +1,16 @@
-﻿using PersonalFinanceApplication.Models;
+﻿using PersonalFinanceApplication.DTOs.RecurringBill;
+using PersonalFinanceApplication.Models;
 
 namespace PersonalFinanceApplication.Interfaces
 {
     public interface IRecurringBillService
     {
-        Task<RecurringBill> GetRecurringBillByIdAsync(int id);
-        Task<IEnumerable<RecurringBill>> GetUserRecurringBillsAsync(int userId);
-        Task<RecurringBill> CreateRecurringBillAsync(RecurringBill recurringBill);
-        Task<RecurringBill> UpdateRecurringBillAsync(RecurringBill recurringBill);
+        Task<RecurringBillDTO> GetRecurringBillByIdAsync(int id);
+        Task<IEnumerable<RecurringBillDTO>> GetUserRecurringBillsAsync(int userId);
+        Task<RecurringBillDTO> CreateRecurringBillAsync(CreateRecurringBillDTO dto);
+        Task<RecurringBillDTO> UpdateRecurringBillAsync(int id, UpdateRecurringBillDTO dto);
         Task<bool> DeleteRecurringBillAsync(int id);
-        Task<IEnumerable<RecurringBill>> GetUpcomingBillsAsync(int userId, DateTime startDate, DateTime endDate);
+        Task<IEnumerable<RecurringBillDTO>> GetUpcomingBillsAsync(int userId, DateTime startDate, DateTime endDate);
         Task<bool> MarkBillAsPaidAsync(int id);
     }
 }

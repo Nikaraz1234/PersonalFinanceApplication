@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PersonalFinanceApplication.DTOs.Transaction;
+using System.ComponentModel.DataAnnotations;
 
 namespace PersonalFinanceApplication.DTOs.Budgets.Categories
 {

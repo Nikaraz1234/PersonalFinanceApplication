@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PersonalFinanceApplication.DTOs.Budgets;
 using PersonalFinanceApplication.DTOs.Budgets.Categories;
 using PersonalFinanceApplication.Interfaces;
@@ -34,7 +35,7 @@ namespace PersonalFinanceApplication.Controllers
             var categories = await _budgetService.GetBudgetCategoriesAsync(id);
             return Ok(categories);
         }
-
+  
         [HttpGet("{id}")]
         public async Task<ActionResult<BudgetDTO>> GetBudget(int id)
         {

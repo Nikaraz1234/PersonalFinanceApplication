@@ -1,4 +1,6 @@
-﻿using PersonalFinanceApplication.Data;
+﻿using AutoMapper;
+using PersonalFinanceApplication.Data;
+using PersonalFinanceApplication.DTOs.RecurringBill;
 using PersonalFinanceApplication.Interfaces;
 using PersonalFinanceApplication.Models;
 using System;
@@ -7,46 +9,63 @@ namespace PersonalFinanceApplication.Services
 {
     public class RecurringBillsService : IRecurringBillService
     {
-        private readonly AppDbContext _context;
+        private readonly IRecurringBillRepository _repository;
+        private readonly IMapper _mapper;
 
-        public RecurringBillsService(AppDbContext context)
+        public RecurringBillsService(IRecurringBillRepository repository, IMapper mapper)
         {
-            _context = context;
+            _repository = repository;
+            _mapper = mapper;
         }
 
-        public Task<RecurringBill> CreateRecurringBillAsync(RecurringBill recurringBill)
+        public async Task<RecurringBillDTO> GetRecurringBillByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var bill = await _repository.GetByIdAsync(id);
+            return _mapper.Map<RecurringBillDTO>(bill);
         }
 
-        public Task<bool> DeleteRecurringBillAsync(int id)
+        public async Task<IEnumerable<RecurringBillDTO>> GetUserRecurringBillsAsync(int userId)
         {
-            throw new NotImplementedException();
+            var bills = await _repository.GetByUserIdAsync(userId);
+            return _mapper.Map<IEnumerable<RecurringBillDTO>>(bills);
         }
 
-        public Task<RecurringBill> GetRecurringBillByIdAsync(int id)
+        public async Task<RecurringBillDTO> CreateRecurringBillAsync(CreateRecurringBillDTO dto)
         {
-            throw new NotImplementedException();
+            var bill = _mapper.Map<RecurringBill>(dto);
+            var created = await _repository.CreateAsync(bill);
+            return _mapper.Map<RecurringBillDTO>(created);
         }
 
-        public Task<IEnumerable<RecurringBill>> GetUpcomingBillsAsync(int userId, DateTime startDate, DateTime endDate)
+        public async Task<RecurringBillDTO> UpdateRecurringBillAsync(int id, UpdateRecurringBillDTO dto)
         {
-            throw new NotImplementedException();
+            var bill = await _repository.GetByIdAsync(id);
+            if (bill == null) return null;
+
+            _mapper.Map(dto, bill);
+            var updated = await _repository.UpdateAsync(bill);
+            return _mapper.Map<RecurringBillDTO>(updated);
         }
 
-        public Task<IEnumerable<RecurringBill>> GetUserRecurringBillsAsync(int userId)
+        public async Task<bool> DeleteRecurringBillAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _repository.DeleteAsync(id);
         }
 
-        public Task<bool> MarkBillAsPaidAsync(int id)
+        public async Task<IEnumerable<RecurringBillDTO>> GetUpcomingBillsAsync(int userId, DateTime startDate, DateTime endDate)
         {
-            throw new NotImplementedException();
+            var bills = await _repository.GetUpcomingBillsAsync(userId, startDate, endDate);
+            return _mapper.Map<IEnumerable<RecurringBillDTO>>(bills);
         }
 
-        public Task<RecurringBill> UpdateRecurringBillAsync(RecurringBill recurringBill)
+        public async Task<bool> MarkBillAsPaidAsync(int id)
         {
-            throw new NotImplementedException();
+            var bill = await _repository.GetByIdAsync(id);
+            if (bill == null) return false;
+
+            bill.IsPaid = true;
+            await _repository.UpdateAsync(bill);
+            return true;
         }
     }
 }

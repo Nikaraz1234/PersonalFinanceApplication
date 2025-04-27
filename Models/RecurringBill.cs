@@ -14,17 +14,19 @@ namespace PersonalFinanceApplication.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
-        [Required, Range(1, 31)]
+        [Required, Range(1, 31, ErrorMessage = "Due day must be between 1 and 31")]
         public int DueDay { get; set; }
 
         public bool IsActive { get; set; } = true;
 
         [MaxLength(50)]
-        public string Category { get; set; }
+        public string? Category { get; set; }
 
+        [ForeignKey("User")]
         public int UserId { get; set; }
-        public User User { get; set; }
 
+        public User User { get; set; }
+        public bool IsPaid { get; set; }
         public ICollection<BillPayment> Payments { get; set; } = new List<BillPayment>();
     }
 }

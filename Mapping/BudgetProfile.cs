@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using PersonalFinanceApplication.DTOs.Budgets;
 using PersonalFinanceApplication.DTOs.Budgets.Categories;
+using PersonalFinanceApplication.DTOs.RecurringBill;
+using PersonalFinanceApplication.DTOs.SavingsPot;
+using PersonalFinanceApplication.DTOs.Transaction;
 using PersonalFinanceApplication.Models;
 
 namespace PersonalFinanceApplication.Mapping
@@ -9,6 +12,7 @@ namespace PersonalFinanceApplication.Mapping
     {
         public BudgetProfile()
         {
+            //Budget Mappings
             CreateMap<Budget, BudgetDTO>();
             CreateMap<Budget, BudgetSummaryDTO>()
                 .ForMember(dest => dest.ProgressPercentage,
@@ -22,6 +26,27 @@ namespace PersonalFinanceApplication.Mapping
 
             CreateMap<BudgetCategory, BudgetCategoryDTO>();
             CreateMap<CreateBudgetCategoryDTO, BudgetCategory>();
+
+
+
+            //RecurringBill mappings
+            CreateMap<RecurringBill, RecurringBillDTO>();
+            CreateMap<CreateRecurringBillDTO, RecurringBill>();
+            CreateMap<UpdateRecurringBillDTO, RecurringBill>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            //SavingsPot mappings
+            CreateMap<SavingsPot, SavingsPotDTO>();
+            CreateMap<CreateSavingsPotDTO, SavingsPot>();
+            CreateMap<UpdateSavingsPotDTO, SavingsPot>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            //Transaction mappings
+            CreateMap<CreateTransactionDTO, Transaction>();
+            CreateMap<UpdateTransactionDTO, Transaction>();
+            CreateMap<Transaction, TransactionDTO>()
+                .ForMember(dest => dest.CategoryName,
+                           opt => opt.MapFrom(src => src.BudgetCategory != null ? src.BudgetCategory.Name : null));
         }
     }
 }

@@ -12,7 +12,8 @@ namespace PersonalFinanceApplication.DTOs.Budgets
         [Required]
         [Range(0.01, 1000000)]
         public decimal TotalAmount { get; set; }
-
+        [Required]
+        public int UserId { get; set; }
         [Required]
         public DateTime StartDate { get; set; }
 

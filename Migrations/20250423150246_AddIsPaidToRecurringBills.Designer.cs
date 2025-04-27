@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PersonalFinanceApplication.Data;
@@ -11,9 +12,11 @@ using PersonalFinanceApplication.Data;
 namespace PersonalFinanceApplication.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250423150246_AddIsPaidToRecurringBills")]
+    partial class AddIsPaidToRecurringBills
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,9 +234,6 @@ namespace PersonalFinanceApplication.Migrations
                     b.Property<int?>("BudgetCategoryId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("BudgetCategoryId1")
-                        .HasColumnType("integer");
-
                     b.Property<int?>("BudgetId")
                         .HasColumnType("integer");
 
@@ -259,8 +259,6 @@ namespace PersonalFinanceApplication.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BudgetCategoryId");
-
-                    b.HasIndex("BudgetCategoryId1");
 
                     b.HasIndex("BudgetId");
 
@@ -397,10 +395,6 @@ namespace PersonalFinanceApplication.Migrations
                         .HasForeignKey("BudgetCategoryId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("PersonalFinanceApplication.Models.BudgetCategory", null)
-                        .WithMany("Transactions")
-                        .HasForeignKey("BudgetCategoryId1");
-
                     b.HasOne("PersonalFinanceApplication.Models.Budget", null)
                         .WithMany("Transactions")
                         .HasForeignKey("BudgetId");
@@ -420,11 +414,6 @@ namespace PersonalFinanceApplication.Migrations
                 {
                     b.Navigation("Categories");
 
-                    b.Navigation("Transactions");
-                });
-
-            modelBuilder.Entity("PersonalFinanceApplication.Models.BudgetCategory", b =>
-                {
                     b.Navigation("Transactions");
                 });
 
