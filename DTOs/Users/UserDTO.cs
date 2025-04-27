@@ -22,7 +22,6 @@ namespace PersonalFinanceApplication.DTOs.Users
         public DateTime CreatedAt { get; set; }
         public DateTime? LastLogin { get; set; }
 
-        // Calculated property
         public string FullName => $"{FirstName} {LastName}".Trim();
     }
 }

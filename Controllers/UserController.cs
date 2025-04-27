@@ -148,7 +148,7 @@ namespace PersonalFinanceApplication.Controllers
                 return Unauthorized(new { Message = "Invalid email or password" });
             }
         }
-        }
+        
 
         private string? GetCookieDomain()
         {

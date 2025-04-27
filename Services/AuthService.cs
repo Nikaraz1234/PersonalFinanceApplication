@@ -82,19 +82,16 @@ namespace PersonalFinanceApplication.Services
             try
             {
                 _logger.LogInformation("Starting registration for {Email}", userDto.Email);
-                var normalizedEmail = userDto.Email.Trim().ToLower();
-                var normalizedUsername = userDto.Username.Trim();
+                
 
-                // Check if email exists
                 _logger.LogInformation("Checking if email exists...");
-                if (await _userRepository.EmailExists(normalizedEmail))
+                if (await _userRepository.EmailExists(userDto.Email))
                 {
                     throw new AuthException("Email already registered");
                 }
 
-                // Check if username exists
                 _logger.LogInformation("Checking if username exists...");
-                if (await _userRepository.Exists(normalizedUsername))
+                if (await _userRepository.Exists(userDto.Username))
                 {
                     throw new AuthException("Username already exists");
                 }
@@ -105,8 +102,8 @@ namespace PersonalFinanceApplication.Services
                 _logger.LogInformation("Creating user object...");
                 var user = new User
                 {
-                    Email = normalizedEmail,
-                    Username = normalizedUsername,
+                    Email = userDto.Email,
+                    Username = userDto.Username,
                     PasswordHash = hashedPassword,
                     CreatedAt = DateTime.UtcNow,
                     FirstName = string.Empty,
