@@ -50,8 +50,9 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy.WithOrigins(
-                "http://localhost:3000",  // Frontend dev URL
-                "https://localhost:3000"  // If frontend uses HTTPS locally
+                "http://localhost:3000",  
+                "https://localhost:3000",
+                "https://personal-finance-dv25q8rb1-sabas-projects-576db12d.vercel.app/"
               )
               .AllowAnyHeader()
               .AllowAnyMethod()
