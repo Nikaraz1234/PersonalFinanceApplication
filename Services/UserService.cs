@@ -68,7 +68,6 @@ namespace PersonalFinanceApplication.Services
             return new AuthResponseDto
             {
      
-                // Token generation would happen here
             };
         }
 

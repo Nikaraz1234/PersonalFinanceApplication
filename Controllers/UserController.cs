@@ -128,7 +128,7 @@ namespace PersonalFinanceApplication.Controllers
                 Response.Cookies.Append("access_token", token, new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = false,
+                    Secure = !Request.Host.Host.Contains("localhost"),
                     SameSite = Request.Host.Host.Contains("localhost")
                     ? SameSiteMode.Unspecified
                     : SameSiteMode.Lax,
