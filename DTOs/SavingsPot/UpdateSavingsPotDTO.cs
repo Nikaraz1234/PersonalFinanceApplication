@@ -4,11 +4,13 @@ namespace PersonalFinanceApplication.DTOs.SavingsPot
 {
     public class UpdateSavingsPotDTO
     {
-        [Required]
-        public int Id { get; set; }
+        [Required, MaxLength(100)]
+        public string Name { get; set; }
 
-        [StringLength(100)]
-        public string? Name { get; set; }
+        [Required, Range(0.01, 1000000)]
+        public decimal TargetAmount { get; set; }
+
+        public DateTime? TargetDate { get; set; }
     }
 
 }

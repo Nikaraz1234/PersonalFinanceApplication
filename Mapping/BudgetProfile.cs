@@ -47,6 +47,17 @@ namespace PersonalFinanceApplication.Mapping
             CreateMap<Transaction, TransactionDTO>()
                 .ForMember(dest => dest.CategoryName,
                            opt => opt.MapFrom(src => src.BudgetCategory != null ? src.BudgetCategory.Name : null));
+
+            // SavingsPot
+            CreateMap<SavingsPot, SavingsPotDTO>()
+                .ForMember(dest => dest.Transactions, opt => opt.MapFrom(src => src.Transactions));
+
+            CreateMap<CreateSavingsPotDTO, SavingsPot>();
+            CreateMap<UpdateSavingsPotDTO, SavingsPot>();
+
+            // SavingsTransaction
+            CreateMap<SavingsTransaction, SavingsTransactionDto>();
+            CreateMap<SavingsTransactionCreateDto, SavingsTransaction>();
         }
     }
 }
