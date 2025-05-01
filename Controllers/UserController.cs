@@ -123,7 +123,7 @@ namespace PersonalFinanceApplication.Controllers
                 {
                     HttpOnly = true,
                     Secure = !isLocalhost,
-                    SameSite = isLocalhost ? SameSiteMode.None : SameSiteMode.Lax,
+                    SameSite = SameSiteMode.None,
                     Expires = DateTime.UtcNow.AddDays(7),
                     Domain = isLocalhost ? null : "personalfinanceapplication.onrender.com", 
                     Path = "/",

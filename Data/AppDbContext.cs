@@ -134,7 +134,6 @@ namespace PersonalFinanceApplication.Data
             modelBuilder.Entity<SavingsPot>()
                 .HasIndex(sp => sp.UserId);
 
-            // Removed UserId index from SavingsTransaction since we removed the User relationship
             modelBuilder.Entity<SavingsTransaction>()
                 .HasIndex(st => st.Date);
         }

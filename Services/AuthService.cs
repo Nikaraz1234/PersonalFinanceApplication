@@ -79,86 +79,46 @@ namespace PersonalFinanceApplication.Services
 
         public async Task<AuthResponseDto> RegisterAsync(UserRegisterDTO userDto)
         {
-            try
+            if (userDto == null)
+                throw new ArgumentNullException(nameof(userDto));
+
+            _logger.LogInformation("Starting registration for {Email}", userDto.Email);
+
+            // Check existing users
+            if (await _userRepository.EmailExists(userDto.Email))
+                throw new AuthException("Email already registered");
+
+            if (await _userRepository.Exists(userDto.Username))
+                throw new AuthException("Username already exists");
+
+            // Hash password
+            var hashedPassword = _passwordHasher.HashPassword(userDto.Password);
+
+            // Create user
+            var user = new User
             {
-                _logger.LogInformation("Starting registration for {Email}", userDto.Email);
-                
+                Email = userDto.Email.Trim().ToLower(),
+                Username = userDto.Username.Trim(),
+                PasswordHash = hashedPassword,
+                CreatedAt = DateTime.UtcNow
+            };
 
-                _logger.LogInformation("Checking if email exists...");
-                if (await _userRepository.EmailExists(userDto.Email))
-                {
-                    throw new AuthException("Email already registered");
-                }
+            // Save user
+            await _userRepository.AddAsync(user);
+            _logger.LogInformation("User registered with ID: {UserId}", user.Id);
 
-                _logger.LogInformation("Checking if username exists...");
-                if (await _userRepository.Exists(userDto.Username))
-                {
-                    throw new AuthException("Username already exists");
-                }
+            // Generate token
+            var (token, expiry) = _tokenService.CreateToken(user);
 
-                _logger.LogInformation("Hashing password...");
-                var hashedPassword = _passwordHasher.HashPassword(userDto.Password);
-
-                _logger.LogInformation("Creating user object...");
-                var user = new User
-                {
-                    Email = userDto.Email,
-                    Username = userDto.Username,
-                    PasswordHash = hashedPassword,
-                    CreatedAt = DateTime.UtcNow,
-                    FirstName = string.Empty,
-                    LastName = string.Empty,
-                    Budgets = new List<Budget>(),
-                    Transactions = new List<Transaction>(),
-                    SavingsPots = new List<SavingsPot>(),
-                    RecurringBills = new List<RecurringBill>()
-                };
-
-                _logger.LogInformation("Saving user to database...");
-                await _userRepository.AddAsync(user);
-                _logger.LogInformation("User registered successfully with ID: {UserId}", user.Id);
-
-                _logger.LogInformation("Generating JWT token...");
-                var (token, expiry) = _tokenService.CreateToken(user);
-
-                _logger.LogInformation("Returning auth response...");
-                return new AuthResponseDto
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    Username = user.Username,
-                    CreatedAt = user.CreatedAt,
-                    AccessToken = token,
-                    TokenExpiry = expiry
-                };
-            }
-            catch (AuthException ex)
+            return new AuthResponseDto
             {
-                _logger.LogWarning("Registration failed - {Message}", ex.Message);
-                throw;
-            }
-            catch (DbUpdateException dbEx)
-            {
-                _logger.LogError(dbEx, "Database error during registration: {Message}", dbEx.Message);
-
-                if (dbEx.InnerException != null)
-                {
-                    _logger.LogError("Inner exception: {Message}", dbEx.InnerException.Message);
-                }
-
-                throw new AuthException("Database error occurred. Please check unique constraints or data formats.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unhandled exception during registration for {Email}", userDto.Email);
-
-                if (ex.InnerException != null)
-                {
-                    _logger.LogError("Inner exception: {Message}", ex.InnerException.Message);
-                }
-
-                throw new AuthException($"Registration failed. Please try again. [DEBUG: {ex.Message}]");
-            }
+                Id = user.Id,
+                Email = user.Email,
+                Username = user.Username,
+                CreatedAt = user.CreatedAt,
+                AccessToken = token,
+                TokenExpiry = expiry
+            };
         }
 
         public async Task<bool> UserExistsAsync(string username)

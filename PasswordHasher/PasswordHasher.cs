@@ -17,6 +17,11 @@ namespace PersonalFinanceApplication.PasswordHasher
         public string HashPassword(string password)
         {
 
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentNullException(nameof(password), "Password cannot be null or empty");
+            }
+
             byte[] salt = new byte[SaltSize];
             using (var rng = RandomNumberGenerator.Create())
             {
