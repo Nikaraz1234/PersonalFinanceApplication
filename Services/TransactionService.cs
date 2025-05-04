@@ -4,6 +4,8 @@ using PersonalFinanceApplication.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using PersonalFinanceApplication.DTOs.Transaction;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using PersonalFinanceApplication.DTOs.Pagination;
 
 namespace PersonalFinanceApplication.Services
 {
@@ -50,9 +52,11 @@ namespace PersonalFinanceApplication.Services
             return _mapper.Map<IEnumerable<TransactionDTO>>(transactions);
         }
 
-        public async Task<IEnumerable<TransactionDTO>> SearchTransactionsAsync(int userId, string searchTerm, DateTime? startDate, DateTime? endDate, int? categoryId)
+        public async Task<IEnumerable<TransactionDTO>> SearchTransactionsAsync(int userId, string searchTerm, DateTime? startDate, DateTime? endDate, int? categoryId,
+        string sortBy = "Date",
+        string sortDirection = "desc")
         {
-            var transactions = await _transactionRepository.SearchTransactionsAsync(userId, searchTerm, startDate, endDate, categoryId);
+            var transactions = await _transactionRepository.SearchTransactionsAsync(userId, searchTerm, startDate, endDate, categoryId, sortBy, sortDirection);
             return _mapper.Map<IEnumerable<TransactionDTO>>(transactions);
         }
 
@@ -69,5 +73,23 @@ namespace PersonalFinanceApplication.Services
             var updatedTransaction = await _transactionRepository.UpdateTransactionAsync(existingTransaction);
             return _mapper.Map<TransactionDTO>(updatedTransaction);
         }
+        public async Task<PaginatedResult<TransactionDTO>> GetUserTransactionsPagedAsync(int userId, PaginationParams pagination)
+        {
+            var result = await _transactionRepository.GetUserTransactionsPagedAsync(userId, pagination);
+
+            return new PaginatedResult<TransactionDTO>
+            {
+                Items = result.Items.Select(t => new TransactionDTO
+                {
+                    Id = t.Id,
+                    Description = t.Description,
+                    Amount = t.Amount,
+                    Date = t.Date,
+                    CategoryName = t.BudgetCategory?.Name,
+                }),
+                TotalCount = result.TotalCount
+            };
+        }
+
     }
 }

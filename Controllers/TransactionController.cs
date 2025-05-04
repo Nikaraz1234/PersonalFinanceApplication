@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PersonalFinanceApplication.DTOs.Pagination;
 using PersonalFinanceApplication.DTOs.Transaction;
 using PersonalFinanceApplication.Interfaces;
 
@@ -33,11 +34,13 @@ namespace PersonalFinanceApplication.Controllers
             return Ok(transaction);
         }
 
-        [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<TransactionDTO>>> GetUserTransactions(int userId)
+        [HttpGet("user/{userId}/paged")]
+        public async Task<ActionResult<PaginatedResult<TransactionDTO>>> GetUserTransactionsPaged(
+        int userId,
+        [FromQuery] PaginationParams pagination)
         {
-            var transactions = await _transactionService.GetUserTransactionsAsync(userId);
-            return Ok(transactions);
+            var pagedTransactions = await _transactionService.GetUserTransactionsPagedAsync(userId, pagination);
+            return Ok(pagedTransactions);
         }
 
         [HttpGet("search")]
@@ -46,10 +49,12 @@ namespace PersonalFinanceApplication.Controllers
             [FromQuery] string searchTerm = null,
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null,
-            [FromQuery] int? categoryId = null)
+            [FromQuery] int? categoryId = null,
+            [FromQuery] string sortBy = "Date",
+            [FromQuery] string sortDirection = "desc")
         {
             var transactions = await _transactionService.SearchTransactionsAsync(
-                userId, searchTerm, startDate, endDate, categoryId);
+                userId, searchTerm, startDate, endDate, categoryId, sortBy, sortDirection);
 
             return Ok(transactions);
         }

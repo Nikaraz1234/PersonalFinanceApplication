@@ -3,6 +3,7 @@ using PersonalFinanceApplication.Data;
 using PersonalFinanceApplication.Models;
 using PersonalFinanceApplication.Interfaces;
 using PersonalFinanceApplication.DTOs.Transaction;
+using PersonalFinanceApplication.DTOs.Pagination;
 
 
 namespace PersonalFinanceApplication.Repositories
@@ -58,7 +59,9 @@ namespace PersonalFinanceApplication.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Transaction>> SearchTransactionsAsync(int userId, string searchTerm, DateTime? startDate, DateTime? endDate, int? categoryId)
+        public async Task<IEnumerable<Transaction>> SearchTransactionsAsync(int userId, string searchTerm, DateTime? startDate, DateTime? endDate, int? categoryId,
+        string sortBy = "Date",
+        string sortDirection = "desc")
         {
             var query = _context.Transactions
                 .Where(t => t.UserId == userId)
@@ -84,8 +87,27 @@ namespace PersonalFinanceApplication.Repositories
             {
                 query = query.Where(t => t.BudgetCategoryId == categoryId.Value);
             }
-
-            return await query.OrderByDescending(t => t.Date).ToListAsync();
+            if (sortDirection.ToLower() == "asc")
+            {
+                query = sortBy.ToLower() switch
+                {
+                    "date" => query.OrderBy(t => t.Date),
+                    "amount" => query.OrderBy(t => t.Amount),
+                    "description" => query.OrderBy(t => t.Description),
+                    _ => query.OrderBy(t => t.Date) 
+                };
+            }
+            else if (sortDirection.ToLower() == "desc")
+            {
+                query = sortBy.ToLower() switch
+                {
+                    "date" => query.OrderByDescending(t => t.Date),
+                    "amount" => query.OrderByDescending(t => t.Amount),
+                    "description" => query.OrderByDescending(t => t.Description),
+                    _ => query.OrderByDescending(t => t.Date)
+                };
+            }
+            return await query.ToListAsync();
         }
 
         public async Task<bool> TransactionExists(int id)
@@ -106,6 +128,40 @@ namespace PersonalFinanceApplication.Repositories
                 .OrderByDescending(t => t.Date)
                 .ToListAsync();
         }
+        public async Task<PaginatedResult<Transaction>> GetUserTransactionsPagedAsync(int userId, PaginationParams pagination)
+        {
+            var query = _context.Transactions
+                .Where(t => t.UserId == userId)
+                .Include(t => t.BudgetCategory)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(pagination.SearchTerm))
+                query = query.Where(t => t.Description.Contains(pagination.SearchTerm));
+
+            if (pagination.CategoryId.HasValue)
+                query = query.Where(t => t.BudgetCategoryId == pagination.CategoryId.Value);
+
+            query = pagination.SortBy?.ToLower() switch
+            {
+                "amount" => pagination.IsDescending ? query.OrderByDescending(t => t.Amount) : query.OrderBy(t => t.Amount),
+                "date" => pagination.IsDescending ? query.OrderByDescending(t => t.Date) : query.OrderBy(t => t.Date),
+                _ => query.OrderByDescending(t => t.Date)
+            };
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+                .Take(pagination.PageSize)
+                .ToListAsync();
+
+            return new PaginatedResult<Transaction>
+            {
+                Items = items,
+                TotalCount = totalCount
+            };
+        }
+
 
     }
 }

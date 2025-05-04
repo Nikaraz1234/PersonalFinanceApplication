@@ -19,7 +19,8 @@ namespace PersonalFinanceApplication.Models
 
         [MaxLength(100)]
         public string? LastName { get; set; }
-
+        [Range(0, double.MaxValue)]
+        public decimal MainBalance { get; set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastLogin { get; set; }
 

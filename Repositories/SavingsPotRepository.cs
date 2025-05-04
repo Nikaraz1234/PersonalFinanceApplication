@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore;
 using PersonalFinanceApplication.Data;
 using PersonalFinanceApplication.Interfaces;
 using PersonalFinanceApplication.Models;
@@ -30,7 +31,14 @@ namespace PersonalFinanceApplication.Repositories
             => _context.SavingsPots.Update(pot);
 
         public async Task DeleteAsync(SavingsPot pot)
-            => _context.SavingsPots.Remove(pot);
+        {
+            var user = await _context.Users.FindAsync(pot.UserId);
+
+            user.MainBalance += pot.CurrentAmount;
+
+            _context.SavingsPots.Remove(pot);
+        }
+            
 
         public async Task SaveChangesAsync()
             => await _context.SaveChangesAsync();

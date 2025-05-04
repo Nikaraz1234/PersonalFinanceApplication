@@ -2,6 +2,7 @@
 using PersonalFinanceApplication.DTOs.SavingsPot;
 using PersonalFinanceApplication.Interfaces;
 using PersonalFinanceApplication.Models;
+using Supabase.Gotrue;
 
 namespace PersonalFinanceApplication.Services
 {
@@ -59,7 +60,7 @@ namespace PersonalFinanceApplication.Services
         {
             var pot = await _potRepo.GetByIdAsync(id);
             if (pot == null) return false;
-
+            
             // Return funds to user's main balance (handled elsewhere)
             await _potRepo.DeleteAsync(pot);
             await _potRepo.SaveChangesAsync();

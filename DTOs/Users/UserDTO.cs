@@ -19,6 +19,7 @@ namespace PersonalFinanceApplication.DTOs.Users
         [MaxLength(100)]
         public string LastName { get; set; }
 
+        public decimal MainBalance { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? LastLogin { get; set; }
 
