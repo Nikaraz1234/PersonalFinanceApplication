@@ -1,16 +1,17 @@
-﻿using PersonalFinanceApplication.Models;
+﻿using PersonalFinanceApplication.DTOs.SavingsPot;
+using PersonalFinanceApplication.Models;
 
 namespace PersonalFinanceApplication.Interfaces
 {
     public interface ISavingsPotService
     {
-        Task<SavingsPot> GetSavingsPotByIdAsync(int id);
-        Task<IEnumerable<SavingsPot>> GetUserSavingsPotsAsync(int userId);
-        Task<SavingsPot> CreateSavingsPotAsync(SavingsPot savingsPot);
-        Task<SavingsPot> UpdateSavingsPotAsync(SavingsPot savingsPot);
-        Task<bool> DeleteSavingsPotAsync(int id);
-        Task<bool> AddMoneyToPotAsync(int potId, decimal amount);
-        Task<bool> WithdrawMoneyFromPotAsync(int potId, decimal amount);
-
+        Task<List<SavingsPotDTO>> GetAllByUserAsync(int userId);
+        Task<SavingsPotDTO> GetByIdAsync(int id);
+        Task<SavingsPotDTO> CreateAsync(CreateSavingsPotDTO dto);
+        Task<SavingsPotDTO> UpdateAsync(int id, UpdateSavingsPotDTO dto);
+        Task<bool> DeleteAsync(int id);
+        Task<SavingsTransactionDto> AddTransactionAsync(SavingsTransactionCreateDto dto);
+        Task<List<SavingsTransactionDto>> GetTransactionsByPotIdAsync(int potId);
+        Task<decimal> GetCurrentBalanceAsync(int id);
     }
 }

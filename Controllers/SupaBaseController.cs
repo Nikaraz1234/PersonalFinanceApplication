@@ -15,7 +15,7 @@ namespace PersonalFinanceApplication.Controllers
 
 
         [HttpGet("GetUsers")]
-        public async Task<IActionResult> GetUsers()
+       public async Task<IActionResult> GetUsers()
         {
             var users = new List<string>();
 
