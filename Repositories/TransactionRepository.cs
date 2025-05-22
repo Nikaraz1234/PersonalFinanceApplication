@@ -161,7 +161,29 @@ namespace PersonalFinanceApplication.Repositories
                 TotalCount = totalCount
             };
         }
+        public async Task<List<Transaction>> GetLatestThreeTransactionsPerCategoryAsync()
+        {
+            var transactions = await _context.Transactions
+                .OrderByDescending(t => t.Date)
+                .ToListAsync();
 
+            return transactions
+                .GroupBy(t => t.Category)
+                .SelectMany(g => g.Take(3))
+                .ToList();
+        }
+
+        public async Task<Dictionary<string, decimal>> GetMonthlySpendingAsync()
+        {
+            return await _context.Transactions
+                .GroupBy(t => new { t.Date.Year, t.Date.Month })
+                .Select(g => new
+                {
+                    Month = $"{g.Key.Year}-{g.Key.Month:00}",
+                    Total = g.Sum(t => t.Amount)
+                })
+                .ToDictionaryAsync(x => x.Month, x => x.Total);
+        }
 
     }
 }

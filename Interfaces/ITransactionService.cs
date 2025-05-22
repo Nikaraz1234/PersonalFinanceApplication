@@ -14,5 +14,7 @@ namespace PersonalFinanceApplication.Interfaces
         Task<TransactionDTO> UpdateTransactionAsync(UpdateTransactionDTO transactionDto);
         Task DeleteTransactionAsync(int id);
         Task<PaginatedResult<TransactionDTO>> GetUserTransactionsPagedAsync(int userId, PaginationParams pagination);
+        Task<List<Transaction>> GetLatestThreeTransactionsPerCategoryAsync();
+        Task<Dictionary<string, decimal>> GetMonthlySpendingAsync();
     }
 }

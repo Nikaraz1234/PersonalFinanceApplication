@@ -70,7 +70,19 @@ namespace PersonalFinanceApplication.Controllers
             var createdTransaction = await _transactionService.CreateTransactionAsync(transactionDto);
             return CreatedAtAction(nameof(GetTransaction), new { id = createdTransaction.Id }, createdTransaction);
         }
+        [HttpGet("latest-three-per-category")]
+        public async Task<IActionResult> GetLatestThreeTransactionsPerCategory()
+        {
+            var result = await _transactionService.GetLatestThreeTransactionsPerCategoryAsync();
+            return Ok(result);
+        }
 
+        [HttpGet("monthly-spending")]
+        public async Task<IActionResult> GetMonthlySpending()
+        {
+            var result = await _transactionService.GetMonthlySpendingAsync();
+            return Ok(result);
+        }
         [HttpPut]
         public async Task<ActionResult<TransactionDTO>> UpdateTransaction(UpdateTransactionDTO transactionDto)
         {

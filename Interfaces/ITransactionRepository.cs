@@ -16,6 +16,9 @@ namespace PersonalFinanceApplication.Interfaces
         Task<bool> TransactionExists(int id);
         Task<IEnumerable<Transaction>> GetTransactionsByCategoryAsync(int categoryId);
         Task<PaginatedResult<Transaction>> GetUserTransactionsPagedAsync(int userId, PaginationParams pagination);
+        Task<List<Transaction>> GetLatestThreeTransactionsPerCategoryAsync();
+        Task<Dictionary<string, decimal>> GetMonthlySpendingAsync();
+
 
 
     }

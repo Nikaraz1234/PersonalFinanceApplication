@@ -90,6 +90,15 @@ namespace PersonalFinanceApplication.Services
                 TotalCount = result.TotalCount
             };
         }
+        public Task<List<Transaction>> GetLatestThreeTransactionsPerCategoryAsync()
+        {
+            return _transactionRepository.GetLatestThreeTransactionsPerCategoryAsync();
+        }
+
+        public Task<Dictionary<string, decimal>> GetMonthlySpendingAsync()
+        {
+            return _transactionRepository.GetMonthlySpendingAsync();
+        }
 
     }
 }
